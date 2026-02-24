@@ -19,6 +19,7 @@ namespace MultiShop.RabbitMQMessageApi.Controllers
             };
             var connection= connectionfactory.CreateConnection();
             var channel = connection.CreateModel();
+
             channel.QueueDeclare("Kuyruk1",false,false,false,arguments:null);
             var messageContent="Merhaba bu bir RabbitMQ kuyruk mesajıdır";
             var byteMessageContent=Encoding.UTF8.GetBytes(messageContent);
