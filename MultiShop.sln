@@ -102,7 +102,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMQMessage", "RabbitMQ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiShop.RabbitMQMessageApi", "RabbitMQMessage\MultiShop.RabbitMQMessageApi\MultiShop.RabbitMQMessageApi.csproj", "{A43CC06B-ED23-46B8-8659-77016C846AAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiShop.RapidApiWebUı", "RapidApi\MultiShop.RapidApiWebUı\MultiShop.RapidApiWebUı.csproj", "{59E5C573-9454-4EDD-8597-30DB4873C675}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiShop.RapidApiWebUı", "Services\RapidApi\MultiShop.RapidApiWebUı\MultiShop.RapidApiWebUı.csproj", "{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -198,10 +198,10 @@ Global
 		{A43CC06B-ED23-46B8-8659-77016C846AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A43CC06B-ED23-46B8-8659-77016C846AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A43CC06B-ED23-46B8-8659-77016C846AAB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59E5C573-9454-4EDD-8597-30DB4873C675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59E5C573-9454-4EDD-8597-30DB4873C675}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59E5C573-9454-4EDD-8597-30DB4873C675}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59E5C573-9454-4EDD-8597-30DB4873C675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,7 +244,7 @@ Global
 		{6441E34E-79F3-4B5C-AF19-86D0DF381D98} = {7455040B-ACCD-4DC7-97A1-72CB3FAE1D27}
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {A0370056-D424-404E-B90D-145BFC51BFE8}
 		{A43CC06B-ED23-46B8-8659-77016C846AAB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{59E5C573-9454-4EDD-8597-30DB4873C675} = {E42C2847-7E71-40A3-AE72-EC6314AA90ED}
+		{1CFFC57E-DDA7-4959-BEF7-3BF759C2F82F} = {E42C2847-7E71-40A3-AE72-EC6314AA90ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46A97610-15A8-467A-BAB7-5FA7388A56C1}
