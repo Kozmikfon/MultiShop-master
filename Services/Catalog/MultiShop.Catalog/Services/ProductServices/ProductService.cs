@@ -25,6 +25,7 @@ namespace MultiShop.Catalog.Services.ProductServices
             var values = _mapper.Map<Product>(createProductDto);
             await _productCollection.InsertOneAsync(values);
         }
+
         public async Task DeleteProductAsync(string id)
         {
             await _productCollection.DeleteOneAsync(x => x.ProductId == id);
