@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MultiShop.Seller.DataAccessLayer\MultiShop.Seller.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\MultiShop.Seller.DtoLayer\MultiShop.Seller.DtoLayer.csproj" />
     <ProjectReference Include="..\MultiShop.Seller.EntityLayer\MultiShop.Seller.EntityLayer.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,7 @@
-﻿using MultiShop.Seller.Businesslayer.Abstract;
+﻿using AutoMapper;
+using MultiShop.Seller.Businesslayer.Abstract;
 using MultiShop.Seller.DataAccessLayer.Abstract;
+using MultiShop.Seller.DtoLayer.Dtos.VendorDtos;
 using MultiShop.Seller.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,34 +13,40 @@ namespace MultiShop.Seller.Businesslayer.Concrete
 {
     public class VendorManager : IVendorService
     {
+        private readonly IMapper _mapper;
         private readonly IVendorDal _vendorDal;
-        public VendorManager(IVendorDal vendorDal)
+        public VendorManager(IVendorDal vendorDal, IMapper mapper)
         {
-            _vendorDal = vendorDal; 
+            _vendorDal = vendorDal;
+            _mapper = mapper;
         }
         public async Task TDeleteAsync(int id)
         {
            await _vendorDal.DeleteAsync(id);
         }
 
-        public async Task<List<Vendor>> TGetAllAsync()
+        public async Task<List<ResultVendorDto>> TGetAllAsync()
         {
-           return await _vendorDal.GetAllAsync();
+           var values=await _vendorDal.GetAllAsync();
+            return _mapper.Map<List<ResultVendorDto>>(values);
         }
 
-        public async Task<Vendor> TGetByIdAsync(int id)
+        public async Task<GetByIdVendorDto> TGetByIdAsync(int id)
         {
-            return await _vendorDal.GetByIdAsync(id);
+            var value=await _vendorDal.GetByIdAsync(id);
+            return _mapper.Map<GetByIdVendorDto>(value);
         }
 
-        public async Task TInsertAsync(Vendor entity)
+        public async Task TInsertAsync(CreateVendorDto createVendorDto)
         {
-            await _vendorDal.InsertAsync(entity);
+            var value=_mapper.Map<Vendor>(createVendorDto);
+            await _vendorDal.InsertAsync(value);
         }
 
-        public async Task TUpdateAsync(Vendor entity)
+        public async Task TUpdateAsync(UpdateVendorDto updateVendorDto)
         {
-            await _vendorDal.UpdateAsync(entity);
+            var value=_mapper.Map<Vendor>(updateVendorDto);
+            await _vendorDal.UpdateAsync(value);
         }
     }
 }

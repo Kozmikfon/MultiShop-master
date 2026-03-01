@@ -1,4 +1,5 @@
-﻿using MultiShop.Seller.EntityLayer.Entities;
+﻿using MultiShop.Seller.DtoLayer.Dtos.VendorDtos;
+using MultiShop.Seller.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Seller.Businesslayer.Abstract
 {
-    public interface IVendorService :IGenericService<Vendor>
+    public interface IVendorService :IGenericService<ResultVendorDto,CreateVendorDto,UpdateVendorDto,GetByIdVendorDto>
     {
     }
 }
