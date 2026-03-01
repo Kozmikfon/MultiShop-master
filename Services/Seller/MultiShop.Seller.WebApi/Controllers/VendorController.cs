@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MultiShop.Seller.Businesslayer.Abstract;
@@ -8,6 +9,7 @@ using MultiShop.Seller.EntityLayer.Entities;
 
 namespace MultiShop.Seller.WebApi.Controllers
 {
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class VendorController : ControllerBase

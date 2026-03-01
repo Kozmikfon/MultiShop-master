@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using MultiShop.Seller.Businesslayer.Abstract;
 using MultiShop.Seller.Businesslayer.Concrete;
@@ -9,6 +10,13 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+{
+    opt.Authority = builder.Configuration["IdentityServerUrl"];
+    opt.Audience = "ResourceVendor";
+    opt.RequireHttpsMetadata = false;
+});
 // Add services to the container.
 builder.Services.AddDbContext<SellerContext>();
 
@@ -32,7 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

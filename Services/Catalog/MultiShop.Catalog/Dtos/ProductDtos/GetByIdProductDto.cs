@@ -8,5 +8,6 @@
         public string ProductImageUrl { get; set; }
         public string ProductDescription { get; set; }
         public string CategoryId { get; set; }
+        public string VendorId { get; set; }
     }
 }
