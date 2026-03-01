@@ -9,6 +9,6 @@ namespace MultiShop.Seller.DtoLayer.Dtos.VendorDtos
     public class GetByIdVendorDto
     {
         public int VendorId { get; set; }
-        public string VendorName { get; set; }
+        public string Name { get; set; }
     }
 }

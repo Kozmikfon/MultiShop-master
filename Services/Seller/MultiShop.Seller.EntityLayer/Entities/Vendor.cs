@@ -15,7 +15,7 @@ namespace MultiShop.Seller.EntityLayer.Entities
         public string Phone { get; set; }
         public string Shopname { get; set; }
         public string TaxNumber { get; set; }
-        public string SubMerchantKey { get; set; }
+        public string? SubMerchantKey { get; set; }
         public bool IsActive { get; set; }
     }
 }

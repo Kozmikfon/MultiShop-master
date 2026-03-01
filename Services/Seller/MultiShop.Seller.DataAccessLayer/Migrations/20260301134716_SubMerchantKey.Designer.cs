@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MultiShop.Seller.DataAccessLayer.Context;
 
@@ -10,9 +11,10 @@ using MultiShop.Seller.DataAccessLayer.Context;
 namespace MultiShop.Seller.DataAccessLayer.Migrations
 {
     [DbContext(typeof(SellerContext))]
-    partial class SellerContextModelSnapshot : ModelSnapshot
+    [Migration("20260301134716_SubMerchantKey")]
+    partial class SubMerchantKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

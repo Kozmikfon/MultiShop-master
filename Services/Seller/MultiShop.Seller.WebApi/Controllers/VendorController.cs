@@ -29,7 +29,7 @@ namespace MultiShop.Seller.WebApi.Controllers
         public async Task<IActionResult> CreateVendor(CreateVendorDto createVendorDto)
         {
             await _vendorService.TInsertAsync(createVendorDto);
-            return Ok("Vendor Başarıyla Oluşturuldu");
+            return Ok("Satıcı Başarıyla Oluşturuldu");
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdVendor(int id)
@@ -41,13 +41,13 @@ namespace MultiShop.Seller.WebApi.Controllers
         public async Task<IActionResult> RemoveVendor(int id)
         {
             await _vendorService.TDeleteAsync(id);
-            return Ok("Vendor Başarıyla Silindi");
+            return Ok("Satıcı Başarıyla Silindi");
         }
         [HttpPut]
         public async Task<IActionResult> UpdateVendor(UpdateVendorDto updateVendorDto)
         {
             await _vendorService.TUpdateAsync(updateVendorDto);
-            return Ok("Vendor Başarıyla Güncellendi");
+            return Ok("Satıcı Başarıyla Güncellendi");
 
         }
     }
