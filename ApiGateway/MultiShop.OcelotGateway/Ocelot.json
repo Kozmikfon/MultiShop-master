@@ -90,7 +90,7 @@
           "Port": 7074
         }
       ],
-      "UpstreamPathTemplate": "/services/basket/{everything}",
+      "UpstreamPathTemplate": "/services/baskets/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamScheme": "http",
       "AuthenticationOptions": {
