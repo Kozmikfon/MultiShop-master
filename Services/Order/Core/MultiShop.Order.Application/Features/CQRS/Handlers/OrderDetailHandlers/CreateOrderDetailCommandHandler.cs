@@ -26,7 +26,8 @@ namespace MultiShop.Order.Application.Features.CQRS.Handlers.OrderDetailHandlers
                 ProductId = command.ProductId,
                 ProductName = command.ProductName,
                 ProductPrice = command.ProductPrice,
-                ProductTotalPrice = command.ProductTotalPrice
+                ProductTotalPrice = command.ProductTotalPrice,
+                VendorId = command.VendorId,
             });
         }
     }

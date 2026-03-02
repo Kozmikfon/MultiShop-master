@@ -17,14 +17,16 @@ namespace MultiShop.Order.WebApi.Controllers
         private readonly CreateOrderDetailCommandHandler _createOrderDetailCommandHandler;
         private readonly RemoveOrderDetailCommandHandler _removeOrderDetailCommandHandler;
         private readonly UpdateOrderDetailCommandHandler _updateOrderDetailCommandHandler;
+        private readonly GetOrderDetailByVendorIdQueryHandler _getOrderDetailByVendorIdQueryHandler;
 
-        public OrderDetailsController(GetOrderDetailQueryHandler getOrderDetailQueryHandler, GetOrderDetailByIdQueryHandler getOrderDetailByIdQueryHandler, CreateOrderDetailCommandHandler createOrderDetailCommandHandler, RemoveOrderDetailCommandHandler removeOrderDetailCommandHandler, UpdateOrderDetailCommandHandler updateOrderDetailCommandHandler)
+        public OrderDetailsController(GetOrderDetailQueryHandler getOrderDetailQueryHandler, GetOrderDetailByIdQueryHandler getOrderDetailByIdQueryHandler, CreateOrderDetailCommandHandler createOrderDetailCommandHandler, RemoveOrderDetailCommandHandler removeOrderDetailCommandHandler, UpdateOrderDetailCommandHandler updateOrderDetailCommandHandler, GetOrderDetailByVendorIdQueryHandler getOrderDetailByVendorIdQueryHandler)
         {
             _getOrderDetailQueryHandler = getOrderDetailQueryHandler;
             _getOrderDetailByIdQueryHandler = getOrderDetailByIdQueryHandler;
             _createOrderDetailCommandHandler = createOrderDetailCommandHandler;
             _removeOrderDetailCommandHandler = removeOrderDetailCommandHandler;
             _updateOrderDetailCommandHandler = updateOrderDetailCommandHandler;
+            _getOrderDetailByVendorIdQueryHandler = getOrderDetailByVendorIdQueryHandler;
         }
 
         [HttpGet]
@@ -60,6 +62,13 @@ namespace MultiShop.Order.WebApi.Controllers
         {
             await _updateOrderDetailCommandHandler.Handle(command);
             return Ok("Sipariş detayı başarıyla güncellendi");
+        }
+
+        [HttpGet("GetOrderDetailByVendorId/{id}")]
+        public async Task<IActionResult> GetOrderDetailByVendorId(string id)
+        {
+            var values=await _getOrderDetailByVendorIdQueryHandler.Handle(new GetOrderDetailByVendorIdQuery(id));
+            return Ok(values);
         }
     }
 }

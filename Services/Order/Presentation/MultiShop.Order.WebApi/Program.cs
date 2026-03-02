@@ -20,6 +20,7 @@ builder.Services.AddDbContext<OrderContext>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IOrderingRepository), typeof(OrderingRepository));
+builder.Services.AddScoped(typeof(IOrderDetailRepository),typeof(OrderDetailRepository));
 builder.Services.AddApplicationService(builder.Configuration);
 
 #region
@@ -34,6 +35,7 @@ builder.Services.AddScoped<GetOrderDetailByIdQueryHandler>();
 builder.Services.AddScoped<CreateOrderDetailCommandHandler>();
 builder.Services.AddScoped<UpdateOrderDetailCommandHandler>();
 builder.Services.AddScoped<RemoveOrderDetailCommandHandler>();
+builder.Services.AddScoped<GetOrderDetailByVendorIdQueryHandler>();
 #endregion
 
 builder.Services.AddControllers();

@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Order.Persistence.Repositories
 {
-    public class OrderingRepository : IOrderingRepository
+    public class OrderingRepository : Repository<Ordering>, IOrderingRepository
     {
         private readonly OrderContext _orderContext;
-        public OrderingRepository(OrderContext orderContext)
+        public OrderingRepository(OrderContext orderContext) : base(orderContext)
         {
             _orderContext = orderContext;
         }
