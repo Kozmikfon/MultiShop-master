@@ -64,6 +64,7 @@ namespace MultiShop.Order.WebApi.Controllers
             return Ok("Sipariş detayı başarıyla güncellendi");
         }
 
+
         [HttpGet("GetOrderDetailByVendorId/{id}")]
         public async Task<IActionResult> GetOrderDetailByVendorId(string id)
         {

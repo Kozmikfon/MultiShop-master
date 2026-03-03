@@ -21,6 +21,7 @@ namespace MultiShop.Order.Persistence.Repositories
         public async Task<List<OrderDetail>> GetOrderDetailsByVendorId(string vendorId)
         {
             return await _orderContext.OrderDetails
+                .Include(x=>x.Ordering)
                 .Where(x => x.VendorId == vendorId)
                 .ToListAsync();
         }

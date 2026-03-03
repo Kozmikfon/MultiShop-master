@@ -30,7 +30,9 @@ namespace MultiShop.Order.Application.Features.CQRS.Handlers.OrderDetailHandlers
                 ProductPrice = x.ProductPrice,
                 ProductTotalPrice = x.ProductTotalPrice,
                 OrderingId = x.OrderingId,
-                VendorId = x.VendorId
+                VendorId = x.VendorId,
+                UserId=x.Ordering.UserId,
+                OrderDate=x.Ordering.OrderDate
             }).ToList();
         }
     }
