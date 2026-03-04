@@ -1,4 +1,5 @@
-﻿using MultiShop.Cargo.DataAccessLayer.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using MultiShop.Cargo.DataAccessLayer.Repositories;
 using MultiShop.Cargo.EntityLayer.Concrete;
@@ -17,9 +18,9 @@ namespace MultiShop.Cargo.DataAccessLayer.EntityFramework
         {
             _cargoContext = cargoContext;
         }
-        public CargoCustomer GetCargoCustomerById(string id)
+        public async Task<CargoCustomer> GetCargoCustomerById(string id)
         {
-            var values = _cargoContext.CargoCustomers.Where(x => x.UserCustomerId == id).FirstOrDefault();
+            var values = await _cargoContext.CargoCustomers.Where(x => x.UserCustomerId == id).FirstOrDefaultAsync();
             return values;
         }
     }

@@ -1,4 +1,5 @@
-﻿using MultiShop.Cargo.DataAccessLayer.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using System;
 using System.Collections.Generic;
@@ -15,31 +16,31 @@ namespace MultiShop.Cargo.DataAccessLayer.Repositories
         {
             _context = context;
         }
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            var values = _context.Set<T>().Find(id);
+            var values = await _context.Set<T>().FindAsync(id);
             _context.Set<T>().Remove(values);
             _context.SaveChanges();
         }
-        public List<T> GetAll()
+        public async Task<List<T>> GetAll()
         {
-            var values = _context.Set<T>().ToList();
+            var values = await _context.Set<T>().ToListAsync();
             return values;
         }
-        public T GetById(int id)
+        public async Task<T> GetById(int id)
         {
-            var value = _context.Set<T>().Find(id);
+            var value = await _context.Set<T>().FindAsync(id);
             return value;
         }
-        public void Insert(T entity)
+        public async Task Insert(T entity)
         {
-            _context.Set<T>().Add(entity);
-            _context.SaveChanges();
+            await _context.Set<T>().AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
             _context.Set<T>().Update(entity);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
     }
 }

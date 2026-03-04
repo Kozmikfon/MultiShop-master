@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DtoLayer.Dtos.CargoCustomerDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
+using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.WebApi.Controllers
 {
@@ -20,67 +21,47 @@ namespace MultiShop.Cargo.WebApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult CargoCustomerList()
+        public async Task<IActionResult> CargoCustomerList()
         {
-            var values = _cargoCustomerService.TGetAll();
+            var values = await _cargoCustomerService.TGetAllAsync();
             return Ok(values);
+
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCargoCustomerById(int id)
+        public async Task<IActionResult> GetCargoCustomerById(int id)
         {
-            var value = _cargoCustomerService.TGetById(id);
+            var value=await _cargoCustomerService.TGetByIdAsync(id);
             return Ok(value);
         }
 
         [HttpPost]
-        public IActionResult CreateCargoCustomer(CreateCargoCustomerDto createCargoCustomerDto)
+        public async Task<IActionResult> CreateCargoCustomer(CreateCargoCustomerDto createCargoCustomerDto)
         {
-            CargoCustomer cargoCustomer = new CargoCustomer()
-            {
-                Address = createCargoCustomerDto.Address,
-                City = createCargoCustomerDto.City,
-                District = createCargoCustomerDto.District,
-                Email = createCargoCustomerDto.Email,
-                Name = createCargoCustomerDto.Name,
-                Phone = createCargoCustomerDto.Phone,
-                Surname = createCargoCustomerDto.Surname,
-                UserCustomerId = createCargoCustomerDto.UserCustomerId
-            };
-            _cargoCustomerService.TInsert(cargoCustomer);
-            return Ok("Kargo Müşteri Ekleme İşlemi Başarıyla Yapıldı");
+            await _cargoCustomerService.TInsertAsync(createCargoCustomerDto);
+            return Ok("kargo müşteri bilgisi eklendi");
         }
 
         [HttpDelete]
-        public IActionResult RemoveCargoCustomer(int id)
+        public async Task<IActionResult> RemoveCargoCustomer(int id)
         {
-            _cargoCustomerService.TDelete(id);
+            await _cargoCustomerService.TDeleteAsync(id);
             return Ok("Kargo Müşteri Silme İşlemi Başarıyla Yapıldı");
         }
 
         [HttpPut]
-        public IActionResult UpdateCargoCustomer(UpdateCargoCustomerDto updateCargoCustomerDto)
+        public async Task<IActionResult> UpdateCargoCustomer(UpdateCargoCustomerDto updateCargoCustomerDto)
         {
-            CargoCustomer cargoCustomer = new CargoCustomer()
-            {
-                Address = updateCargoCustomerDto.Address,
-                CargoCustomerId = updateCargoCustomerDto.CargoCustomerId,
-                City = updateCargoCustomerDto.City,
-                District = updateCargoCustomerDto.District,
-                Email = updateCargoCustomerDto.Email,
-                Name = updateCargoCustomerDto.Name,
-                Phone = updateCargoCustomerDto.Phone,
-                Surname = updateCargoCustomerDto.Surname,
-                UserCustomerId = updateCargoCustomerDto.UserCustomerId
-            };
-            _cargoCustomerService.TUpdate(cargoCustomer);
+            
+            await _cargoCustomerService.TUpdateAsync(updateCargoCustomerDto);
             return Ok("Kargo Müşteri Güncelleme İşlemi Başarıyla Yapıldı");
         }
 
-        [HttpGet("GetCargoCustomerById")]
-        public IActionResult GetCargoCustomerById(string id)
-        {
-            return Ok(_cargoCustomerService.TGetCargoCustomerById(id));
-        }
+        //[HttpGet("GetCargoCustomerById")] 
+        //public async Task<IActionResult> GetCargoCustomerById(string id)
+        //{
+        //    var value = await _cargoCustomerService.TGetByIdAsync(id); 
+        //    return Ok(value);
+        //}
     }
 }

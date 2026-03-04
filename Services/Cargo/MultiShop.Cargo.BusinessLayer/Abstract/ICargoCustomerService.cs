@@ -1,4 +1,5 @@
-﻿using MultiShop.Cargo.EntityLayer.Concrete;
+﻿using MultiShop.Cargo.DtoLayer.Dtos.CargoCustomerDtos;
+using MultiShop.Cargo.EntityLayer.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.BusinessLayer.Abstract
 {
-    public interface ICargoCustomerService : IGenericService<CargoCustomer>
+    public interface ICargoCustomerService : IGenericService<ResultCargoCustomerDto,CreateCargoCustomerDto,UpdateCargoCustomerDto,GetByIdCargoCustomerDto>
     {
-        CargoCustomer TGetCargoCustomerById(string id);
+        Task<CargoCustomer> TGetCargoCustomerById(string id);
     }
 }

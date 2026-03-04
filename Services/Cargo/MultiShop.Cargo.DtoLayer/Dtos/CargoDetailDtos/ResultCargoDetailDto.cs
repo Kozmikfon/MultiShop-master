@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos
 {
-    public class UpdateCargoDetailDto
+    public class ResultCargoDetailDto
     {
         public int CargoDetailId { get; set; }
         public string SenderCustomer { get; set; }

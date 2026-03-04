@@ -1,5 +1,7 @@
-﻿using MultiShop.Cargo.BusinessLayer.Abstract;
+﻿using AutoMapper;
+using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
+using MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
 using System;
 using System.Collections.Generic;
@@ -12,29 +14,46 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
     public class CargoDetailManager : ICargoDetailService
     {
         private readonly ICargoDetailDal _cargoDetailDal;
-        public CargoDetailManager(ICargoDetailDal cargoDetailDal)
+        private readonly IMapper _mapper;
+        public CargoDetailManager(ICargoDetailDal cargoDetailDal, IMapper mapper)
         {
             _cargoDetailDal = cargoDetailDal;
+            _mapper = mapper;
         }
-        public void TDelete(int id)
+
+        public async Task TDeleteAsync(int id)
         {
-            _cargoDetailDal.Delete(id);
+           await _cargoDetailDal.Delete(id);
         }
-        public List<CargoDetail> TGetAll()
+
+        public async Task<List<ResultCargoDetailDto>> TGetAllAsync()
         {
-           return _cargoDetailDal.GetAll();
+            var value=await _cargoDetailDal.GetAll();
+            return _mapper.Map<List<ResultCargoDetailDto>>(value);
         }
-        public CargoDetail TGetById(int id)
+
+        public async Task<GetByIdCargoDetailDto> TGetByIdAsync(int id)
         {
-            return _cargoDetailDal.GetById(id);
+            var value = await _cargoDetailDal.GetById(id);
+            return _mapper.Map<GetByIdCargoDetailDto>(value);
         }
-        public void TInsert(CargoDetail entity)
+
+        public async Task<List<ResultCargoDetailDto>> TGetCargoDetailsByVendorId(string vendorId)
         {
-            _cargoDetailDal.Insert(entity);
+            var value = await _cargoDetailDal.GetCargoDetailsByVendorId(vendorId);
+            return _mapper.Map<List<ResultCargoDetailDto>>(value);
         }
-        public void TUpdate(CargoDetail entity)
+
+        public async Task TInsertAsync(CreateCargoDetailDto createDto)
         {
-            _cargoDetailDal.Update(entity);
+           var value=_mapper.Map<CargoDetail>(createDto);
+            await _cargoDetailDal.Insert(value);
+        }
+
+        public async Task TUpdateAsync(UpdateCargoDetailDto updateDto)
+        {
+            var value = _mapper.Map<CargoDetail>(updateDto);
+            await _cargoDetailDal.Update(value);
         }
     }
 }

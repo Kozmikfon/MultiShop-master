@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.BusinessLayer.Abstract
 {
-    public interface IGenericService<T> where T : class
+    public interface IGenericService<TResult,TCreate,TUpdate,TGetById>
     {
-        void TInsert(T entity);
-        void TUpdate(T entity);
-        void TDelete(int id);
-        T TGetById(int id);
-        List<T> TGetAll();
+       Task TInsertAsync(TCreate createDto);
+       Task TUpdateAsync(TUpdate updateDto);
+       Task TDeleteAsync(int id);
+       Task<List<TResult>> TGetAllAsync();
+       Task<TGetById> TGetByIdAsync(int id);
     }
 }

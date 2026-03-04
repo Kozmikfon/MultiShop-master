@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
+using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.WebApi.Controllers
 {
@@ -19,54 +20,47 @@ namespace MultiShop.Cargo.WebApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult CargoDetailList()
+        public async Task<IActionResult> CargoDetailList()
         {
-            var values = _CargoDetailService.TGetAll();
+            var values =await _CargoDetailService.TGetAllAsync();
             return Ok(values);
         }
 
         [HttpPost]
-        public IActionResult CreateCargoDetail(CreateCargoDetailDto createCargoDetailDto)
+        public async Task<IActionResult> CreateCargoDetail(CreateCargoDetailDto createCargoDetailDto)
         {
-            CargoDetail CargoDetail = new CargoDetail()
-            {
-               Barcode = createCargoDetailDto.Barcode,
-               CargoCompanyId=createCargoDetailDto.CargoCompanyId,
-               ReceiverCustomer=createCargoDetailDto.ReceiverCustomer,
-               SenderCustomer= createCargoDetailDto.SenderCustomer
-            };
-            _CargoDetailService.TInsert(CargoDetail);
+            
+            await _CargoDetailService.TInsertAsync(createCargoDetailDto);
             return Ok("Kargo Detayları Başarıyla Oluşturuldu");
         }
 
         [HttpDelete]
-        public IActionResult RemoveCargoDetail(int id)
+        public async Task<IActionResult> RemoveCargoDetail(int id)
         {
-            _CargoDetailService.TDelete(id);
+            await _CargoDetailService.TDeleteAsync(id);
             return Ok("Kargo Detayları Başarıyla Silindi");
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCargoDetailById(int id)
+        public async Task<IActionResult> GetCargoDetailById(int id)
         {
-            var values = _CargoDetailService.TGetById(id);
+            var values = await _CargoDetailService.TGetByIdAsync(id);
             return Ok(values);
         }
 
         [HttpPut]
-        public IActionResult UpdateCargoDetail(UpdateCargoDetailDto updateCargoDetailDto)
+        public async Task<IActionResult> UpdateCargoDetail(UpdateCargoDetailDto updateCargoDetailDto)
         {
-            CargoDetail CargoDetail = new CargoDetail()
-            {
-               Barcode = updateCargoDetailDto.Barcode,
-               CargoCompanyId= updateCargoDetailDto.CargoCompanyId,
-               CargoDetailId=updateCargoDetailDto.CargoDetailId,
-               ReceiverCustomer=updateCargoDetailDto.ReceiverCustomer,
-               SenderCustomer=updateCargoDetailDto.SenderCustomer
-               
-            };
-            _CargoDetailService.TUpdate(CargoDetail);
+            
+            await _CargoDetailService.TUpdateAsync(updateCargoDetailDto);
             return Ok("Kargo Detayları Başarıyla Güncellendi");
+        }
+
+        [HttpGet("GetCargoDetailByVendorId")]
+        public async Task<IActionResult> GetCargoDetailByVendorId(string id)
+        {
+            var values =await _CargoDetailService.TGetCargoDetailsByVendorId(id);
+            return Ok(values);
         }
     }
 }

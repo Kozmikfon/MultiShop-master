@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DtoLayer.Dtos.CargoCompanyDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
+using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.WebApi.Controllers
 {
@@ -19,47 +20,38 @@ namespace MultiShop.Cargo.WebApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult CargoCompanyList()
+        public async Task<IActionResult> CargoCompanyList()
         {
-            var values = _cargoCompanyService.TGetAll();
+            var values= await _cargoCompanyService.TGetAllAsync();
             return Ok(values);
         }
 
         [HttpPost]
-        public IActionResult CreateCargoCompany(CreateCargoCompanyDto createCargoCompanyDto)
+        public async Task<IActionResult> CreateCargoCompany(CreateCargoCompanyDto createCargoCompanyDto)
         {
-            CargoCompany cargoCompany = new CargoCompany()
-            {
-                CargoCompanyName = createCargoCompanyDto.CargoCompanyName
-            };
-            _cargoCompanyService.TInsert(cargoCompany);
-            return Ok("Kargo Şirketi Başarıyla Oluşturuldu");
+            await _cargoCompanyService.TInsertAsync(createCargoCompanyDto);
+            return Ok("Kargo şirketi oluşturuldu");
         }
 
         [HttpDelete]
-        public IActionResult RemoveCargoCompany(int id)
+        public async Task<IActionResult> RemoveCargoCompany(int id)
         {
-            _cargoCompanyService.TDelete(id);
-            return Ok("Kargo Şirketi Başarıyla Silindi");
+            await _cargoCompanyService.TDeleteAsync(id);
+            return Ok("Kargo şirketi silindi");
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCargoCompanyById(int id)
+        public async Task<IActionResult> GetByIdCargoCompany(int id) //GetCargoCompanyById
         {
-            var values = _cargoCompanyService.TGetById(id);
-            return Ok(values);
+            var value = await _cargoCompanyService.TGetByIdAsync(id);
+            return Ok(value);
         }
 
         [HttpPut]
-        public IActionResult UpdateCargoCompany(UpdateCargoCompanyDto updateCargoCompanyDto)
+        public async Task<IActionResult> UpdateCargoCompany(UpdateCargoCompanyDto updateCargoCompanyDto)
         {
-            CargoCompany cargoCompany = new CargoCompany()
-            {
-                CargoCompanyId = updateCargoCompanyDto.CargoCompanyId,
-                CargoCompanyName = updateCargoCompanyDto.CargoCompanyName
-            };
-            _cargoCompanyService.TUpdate(cargoCompany);
-            return Ok("Kargo Şirketi Başarıyla Güncellendi");
+            await _cargoCompanyService.TUpdateAsync(updateCargoCompanyDto);
+            return Ok("karg şirketi bilgisi güncellendi");
         }
     }
 }

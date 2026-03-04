@@ -1,5 +1,7 @@
-﻿using MultiShop.Cargo.BusinessLayer.Abstract;
+﻿using AutoMapper;
+using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
+using MultiShop.Cargo.DtoLayer.Dtos.CargoCustomerDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
 using System;
 using System.Collections.Generic;
@@ -12,33 +14,46 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
     public class CargoCustomerManager : ICargoCustomerService
     {
         private readonly ICargoCustomerDal _cargoCustomerDal;
-        public CargoCustomerManager(ICargoCustomerDal cargoCustomerDal)
+        private readonly IMapper _mapper;
+        public CargoCustomerManager(ICargoCustomerDal cargoCustomerDal, IMapper mapper)
         {
             _cargoCustomerDal = cargoCustomerDal;
+            _mapper = mapper;
         }
-        public void TDelete(int id)
+
+        public async Task TDeleteAsync(int id)
         {
-            _cargoCustomerDal.Delete(id);
+            await _cargoCustomerDal.Delete(id);
         }
-        public List<CargoCustomer> TGetAll()
+
+        public async Task<List<ResultCargoCustomerDto>> TGetAllAsync()
         {
-            return _cargoCustomerDal.GetAll();
+            var value=await _cargoCustomerDal.GetAll();
+            return _mapper.Map<List<ResultCargoCustomerDto>>(value);
         }
-        public CargoCustomer TGetById(int id)
+
+        public async Task<GetByIdCargoCustomerDto> TGetByIdAsync(int id)
         {
-            return _cargoCustomerDal.GetById(id);
+            var value=await _cargoCustomerDal.GetById(id);
+            return _mapper.Map<GetByIdCargoCustomerDto>(value);
         }
-        public CargoCustomer TGetCargoCustomerById(string id)
+
+        public async Task<CargoCustomer> TGetCargoCustomerById(string id)
         {
-            return _cargoCustomerDal.GetCargoCustomerById(id);
+            var value=await _cargoCustomerDal.GetCargoCustomerById(id);
+            return _mapper.Map<CargoCustomer>(value);
         }
-        public void TInsert(CargoCustomer entity)
+
+        public async Task TInsertAsync(CreateCargoCustomerDto createDto)
         {
-            _cargoCustomerDal.Insert(entity);
+           var value=_mapper.Map<CargoCustomer>(createDto);
+           await _cargoCustomerDal.Insert(value);
         }
-        public void TUpdate(CargoCustomer entity)
+
+        public async Task TUpdateAsync(UpdateCargoCustomerDto updateDto)
         {
-            _cargoCustomerDal.Update(entity);
+           var value=_mapper.Map<CargoCustomer>(updateDto);
+            await _cargoCustomerDal.Update(value);
         }
     }
 }
