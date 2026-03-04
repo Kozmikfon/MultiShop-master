@@ -57,11 +57,11 @@ namespace MultiShop.Cargo.WebApi.Controllers
             return Ok("Kargo Müşteri Güncelleme İşlemi Başarıyla Yapıldı");
         }
 
-        //[HttpGet("GetCargoCustomerById")] 
-        //public async Task<IActionResult> GetCargoCustomerById(string id)
-        //{
-        //    var value = await _cargoCustomerService.TGetByIdAsync(id); 
-        //    return Ok(value);
-        //}
+        [HttpGet("GetCargoCustomerById")]
+        public async Task<IActionResult> GetCargoCustomerById(string id)
+        {
+            var value = await _cargoCustomerService.TGetCargoCustomerById(id);
+            return Ok(value);
+        }
     }
 }

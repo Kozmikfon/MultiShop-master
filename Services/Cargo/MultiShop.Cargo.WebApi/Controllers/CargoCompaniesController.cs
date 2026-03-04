@@ -41,7 +41,7 @@ namespace MultiShop.Cargo.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdCargoCompany(int id) //GetCargoCompanyById
+        public async Task<IActionResult> GetByIdCargoCompany(int id) 
         {
             var value = await _cargoCompanyService.TGetByIdAsync(id);
             return Ok(value);

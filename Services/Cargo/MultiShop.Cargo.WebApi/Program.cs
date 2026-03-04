@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.BusinessLayer.Concrete;
+using MultiShop.Cargo.BusinessLayer.Mapping;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using MultiShop.Cargo.DataAccessLayer.EntityFramework;
@@ -23,6 +24,8 @@ builder.Services.AddScoped<ICargoDetailDal, EfCargoDetailDal>();
 builder.Services.AddScoped<ICargoDetailService, CargoDetailManager>();
 builder.Services.AddScoped<ICargoOperationDal, EfCargoOperationDal>();
 builder.Services.AddScoped<ICargoOperationService, CargoOperationManager>();
+
+builder.Services.AddAutoMapper(typeof(GeneralMapping));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
