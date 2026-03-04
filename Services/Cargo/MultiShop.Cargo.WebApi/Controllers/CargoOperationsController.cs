@@ -55,5 +55,16 @@ namespace MultiShop.Cargo.WebApi.Controllers
             await _CargoOperationService.TUpdateAsync(updateCargoOperationDto);
             return Ok("Kargo İşlemi Başarıyla Güncellendi");
         }
+
+        [HttpGet("GetCargoOperationsByBarcode")]
+        public async Task<IActionResult> GetCargoOperationByBarcode(string barcode)
+        {
+            var values = await _CargoOperationService.TGetCargoOperationsByBarcodeAsync(barcode);
+            if (values==null || !values.Any())
+            {
+                return NotFound("Bu barkoda ait bir kargo hareketi bulunamadı");
+            }
+            return Ok(values);
+        }
     }
 }

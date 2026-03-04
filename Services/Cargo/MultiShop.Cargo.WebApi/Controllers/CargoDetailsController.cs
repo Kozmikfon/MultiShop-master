@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
+using MultiShop.Cargo.EntityLayer.Concrete.Enums;
 using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.WebApi.Controllers
@@ -60,6 +61,12 @@ namespace MultiShop.Cargo.WebApi.Controllers
         public async Task<IActionResult> GetCargoDetailByVendorId(string id)
         {
             var values =await _CargoDetailService.TGetCargoDetailsByVendorId(id);
+            return Ok(values);
+        }
+        [HttpGet("ChangeCargoStatus")]
+        public async Task<IActionResult> ChangeCargoStatus(int id,CargoStatus status)
+        {
+            var values= await _CargoDetailService.TChangeCargoStatus(id, status);
             return Ok(values);
         }
     }

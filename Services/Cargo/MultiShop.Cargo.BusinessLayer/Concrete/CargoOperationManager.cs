@@ -40,6 +40,12 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             return _mapper.Map<GetByIdCargoOperaitonDto>(value);
         }
 
+        public async Task<List<ResultCargoOperationDto>> TGetCargoOperationsByBarcodeAsync(string barcode)
+        {
+            var values = await _cargoOperationDal.GetOperationsByBarcode(barcode);
+            return _mapper.Map<List<ResultCargoOperationDto>>(values);
+        }
+
         public async Task TInsertAsync(CreateCargoOperationDto createDto)
         {
             var value = _mapper.Map<CargoOperation>(createDto);

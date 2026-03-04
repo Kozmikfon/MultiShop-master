@@ -10,5 +10,6 @@ namespace MultiShop.Cargo.BusinessLayer.Abstract
 {
     public interface ICargoOperationService : IGenericService<ResultCargoOperationDto,CreateCargoOperationDto,UpdateCargoOperationDto,GetByIdCargoOperaitonDto>
     {
+        Task<List<ResultCargoOperationDto>> TGetCargoOperationsByBarcodeAsync(string barcode);
     }
 }

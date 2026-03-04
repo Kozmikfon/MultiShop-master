@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiShop.Cargo.EntityLayer.Concrete.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,6 @@ namespace MultiShop.Cargo.EntityLayer.Concrete
         public CargoCustomer CargoCustomer { get; set; }
         public string VendorId { get; set; }
         public int OrderingId { get; set; }
+        public CargoStatus CurrentStatus { get; set; }
     }
 }

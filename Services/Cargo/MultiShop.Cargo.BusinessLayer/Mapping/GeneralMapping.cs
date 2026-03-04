@@ -18,15 +18,24 @@ namespace MultiShop.Cargo.BusinessLayer.Mapping
         {
             CreateMap<CargoDetail,CreateCargoDetailDto>().ReverseMap();
             CreateMap<CargoDetail,UpdateCargoDetailDto>().ReverseMap();
+            CreateMap<CargoDetail, ResultCargoDetailDto>().ReverseMap();
+            CreateMap<CargoDetail, GetByIdCargoDetailDto>().ReverseMap();
+            
 
             CreateMap<CargoCompany, CreateCargoCompanyDto>().ReverseMap();
             CreateMap<CargoCompany, UpdateCargoCompanyDto>().ReverseMap();
+            CreateMap<CargoCompany, ResultCargoCompanyDto>().ReverseMap();
+            CreateMap<CargoCompany, GetByIdCargoCompanyDto>().ReverseMap();
 
             CreateMap<CargoCustomer,CreateCargoCustomerDto>().ReverseMap();
             CreateMap<CargoCustomer, UpdateCargoCustomerDto>().ReverseMap();
+            CreateMap<CargoCustomer, ResultCargoCustomerDto>().ReverseMap();
+            CreateMap<CargoCustomer, GetByIdCargoCustomerDto>().ReverseMap();
 
             CreateMap<CargoOperation, CreateCargoOperationDto>().ReverseMap();
             CreateMap<CargoOperation, UpdateCargoOperationDto>().ReverseMap();
+            CreateMap<CargoOperation, ResultCargoOperationDto>().ReverseMap();
+            CreateMap<CargoOperation, GetByIdCargoOperaitonDto>().ReverseMap();
         }
     }
 }
