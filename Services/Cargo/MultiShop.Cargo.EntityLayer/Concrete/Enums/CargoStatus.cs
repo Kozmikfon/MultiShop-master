@@ -8,13 +8,28 @@ namespace MultiShop.Cargo.EntityLayer.Concrete.Enums
 {
     public enum CargoStatus
     {
-        Hazirlaniyor = 1,      // Satıcı kargoyu hazırlıyor
-        KargoyaVerildi = 2,    // Kargo şirketine teslim edildi
-        Yolda = 3,             // Transfer merkezinde / Araçta
-        Subede = 4,            // Varış şubesinde
-        Dagitimda = 5,         // Kurye üzerinde
-        TeslimEdildi = 6,      // Alıcıya ulaştı
-        IadeEdildi = 7,        // Alıcı kabul etmedi/Geri döndü
-        IptalEdildi = 8        // Sipariş/Kargo iptal
+        // Kayıt oluşturuldu, henüz bir işlem yapılmadı
+        Created = 1,
+
+        // Kargo etiketi basıldı, paketleniyor
+        LabelCreated = 2,
+
+        // Kurye paketi teslim aldı
+        PickedUp = 3,
+
+        // Ana depoda veya transfer merkezinde, yolda
+        InTransit = 4,
+
+        // Dağıtım şubesine ulaştı, kurye dağıtıma çıktı
+        OutForDelivery = 5,
+
+        // Teslimat başarılı
+        Delivered = 6,
+
+        // Alıcı adreste bulunamadı veya teslimat başarısız
+        Failed = 7,
+
+        // Paket göndericiye geri döndü
+        Returned = 8
     }
 }
