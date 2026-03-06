@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.WebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CargoDetailsController : ControllerBase
