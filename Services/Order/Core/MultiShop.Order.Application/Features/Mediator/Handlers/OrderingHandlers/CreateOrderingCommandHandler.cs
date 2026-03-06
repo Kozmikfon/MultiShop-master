@@ -35,22 +35,37 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
 
             await _repository.CreateAsync(ordering);
 
-            var cargoDto = new CreateCargoDetailDto
+            try
             {
-                SenderCustomer = request.SenderCustomer, // TAM DİNAMİK
-                Barcode = new Random().Next(100000, 999999), // Sistem üretir
-                CargoCompanyId = request.CargoCompanyId, // TAM DİNAMİK
-                CargoCustomerId = request.CargoCustomerId, // TAM DİNAMİK
-                VendorId = ordering.UserId, // TAM DİNAMİK
-                OrderingId = ordering.OrderingId // TAM DİNAMİK
-            };
+                var client = _httpClientFactory.CreateClient();
+                var cargoDto = new CreateCargoDetailDto
+                {
+                    SenderCustomer = request.SenderCustomer,
+                    Barcode = new Random().Next(100000, 999999),
+                    CargoCompanyId = request.CargoCompanyId,
+                    CargoCustomerId = request.CargoCustomerId,
+                    VendorId = ordering.UserId,
+                    OrderingId = ordering.OrderingId
+                };
 
-            var client = _httpClientFactory.CreateClient();
-            var jsonData = JsonSerializer.Serialize(cargoDto);
-            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                var jsonData = JsonSerializer.Serialize(cargoDto);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-   
-            await client.PostAsync("http://localhost:7073/api/CargoDetails", content);
+                var response = await client.PostAsync("http://localhost:7073/api/CargoDetails", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Burada log atabilirsin: "Sipariş oluştu ama kargo servisi hata döndü."                  
+                    // Console.WriteLine($"Kargo servisi hatası: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Kargo servisine hiç ulaşılamadı (Server kapalı vb.)
+                // Burada log atabilirsin: "Kargo servisine ulaşılamıyor."
+                // Ama 'throw' yapmıyoruz ki kullanıcı "Siparişiniz alındı" mesajını görebilsin.
+            }
+
         }
     }
 }
