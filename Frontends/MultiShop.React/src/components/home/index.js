@@ -1,0 +1,7 @@
+export { Carousel } from './Carousel/Carousel'
+export { Feature } from './Feature/Feature'
+export { Categories } from './Categories/Categories'
+export { FeatureProducts } from './FeatureProducts/FeatureProducts'
+export { OfferDiscount } from './OfferDiscount/OfferDiscount'
+export { Vendor } from './Vendor/Vendor'
+export { SpecialOffer } from './SpecialOffer/SpecialOffer'

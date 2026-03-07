@@ -1,0 +1,112 @@
+/* Topbar - orijinal template ile aynı (firsatkap-theme.css ile birlikte kullanılır) */
+.topbar-wrapper .firsatkap-logo-text {
+  margin-left: 100px;
+}
+
+.topbar-wrapper .row.bg-light.py-3 {
+  background-color: var(--firsatkap-beyaz, #fff) !important;
+  border-bottom: 1px solid rgba(13, 33, 55, 0.08);
+}
+
+.topbar-wrapper .input-group-text.bg-transparent.text-primary {
+  background-color: transparent !important;
+  color: var(--firsatkap-yesil, #1a7f37) !important;
+}
+
+.topbar-wrapper .form-control {
+  border-color: #dee2e6;
+}
+
+.topbar-wrapper .form-control:focus {
+  border-color: var(--firsatkap-yesil, #1a7f37);
+  box-shadow: 0 0 0 0.2rem rgba(26, 127, 55, 0.25);
+}
+
+/* Arama alanı genişliği */
+.topbar-wrapper .topbar-search-col {
+  max-width: 100%;
+}
+.topbar-wrapper .topbar-input-group {
+  width: 100%;
+  max-width: 100%;
+}
+.topbar-wrapper .topbar-input-group .form-control {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Modern aksiyon butonları grubu */
+.topbar-wrapper .topbar-actions {
+  gap: 0.5rem;
+}
+
+/* İkon butonları (favori, sepet) */
+.topbar-wrapper .topbar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(26, 127, 55, 0.08);
+  color: var(--firsatkap-yesil, #1a7f37);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.topbar-wrapper .topbar-icon-btn:hover {
+  background: rgba(26, 127, 55, 0.18);
+  color: #1a7f37;
+  transform: scale(1.05);
+}
+.topbar-wrapper .topbar-icon-btn:active {
+  transform: scale(0.98);
+}
+.topbar-wrapper .topbar-icon-btn i {
+  font-size: 1.1rem;
+}
+.topbar-wrapper .topbar-icon-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  color: #fff;
+  background: var(--firsatkap-lacivert, #0d2137);
+  border-radius: 50%;
+}
+
+/* Giriş Yap butonu */
+.topbar-wrapper .topbar-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #1a7f37 0%, #2e7d32 100%);
+  border: none;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(26, 127, 55, 0.35);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+.topbar-wrapper .topbar-login-btn:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #2e7d32 0%, #1a7f37 100%);
+  box-shadow: 0 4px 12px rgba(26, 127, 55, 0.45);
+  transform: translateY(-1px);
+}
+.topbar-wrapper .topbar-login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(26, 127, 55, 0.4);
+}
+.topbar-wrapper .topbar-login-btn i {
+  font-size: 0.95rem;
+}

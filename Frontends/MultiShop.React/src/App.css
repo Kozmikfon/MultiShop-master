@@ -1,0 +1,98 @@
+/* MultiShop React - Anasayfa stilleri */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App main {
+  flex: 1;
+}
+
+/* Carousel */
+.home-carousel .carousel-item {
+  transition: opacity 0.5s ease;
+}
+
+.home-carousel .carousel-indicators button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  margin: 0 4px;
+}
+
+.home-carousel .carousel-indicators button.active {
+  background-color: #fff;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  opacity: 0.8;
+}
+
+/* Offer blocks (slider yanı ve kampanya) */
+.product-offer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.25rem;
+}
+
+.product-offer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-offer .offer-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+
+/* Section title */
+.section-title {
+  font-size: 1.25rem;
+}
+
+/* Product card hover */
+.product-item .product-action {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.product-item:hover .product-action {
+  opacity: 1;
+}
+
+/* Vendor carousel */
+.vendor-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Bootstrap overrides if not using full Bootstrap */
+.px-xl-5 {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+@media (max-width: 991px) {
+  .px-xl-5 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

@@ -1,0 +1,212 @@
+/* FırsatKap Tema: Lacivert, Yeşil, Beyaz */
+:root {
+  --firsatkap-lacivert: #0d2137;
+  --firsatkap-lacivert-acik: #1e3a5f;
+  --firsatkap-yesil: #1a7f37;
+  --firsatkap-yesil-acik: #2e7d32;
+  --firsatkap-beyaz: #ffffff;
+  --firsatkap-beyaz-golge: #f8f9fa;
+  --primary: var(--firsatkap-yesil);
+  --dark: var(--firsatkap-lacivert);
+}
+
+/* Anasayfa genel arka plan */
+body {
+  background-color: var(--firsatkap-beyaz-golge) !important;
+}
+
+/* Primary (yeşil) */
+.bg-primary,
+.btn-primary,
+.dropdown-menu.bg-primary .dropdown-item:hover,
+.input-group-text.bg-transparent.text-primary,
+.badge-primary {
+  background-color: var(--firsatkap-yesil) !important;
+  border-color: var(--firsatkap-yesil) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+a.bg-primary:hover,
+button.bg-primary:hover {
+  background-color: var(--firsatkap-yesil-acik) !important;
+  border-color: var(--firsatkap-yesil-acik) !important;
+}
+.text-primary,
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active,
+.fa-heart.text-primary,
+.fas.text-primary,
+.fa-search.text-primary,
+.fa-map-marker-alt.text-primary,
+.fa-envelope.text-primary,
+.fa-phone-alt.text-primary,
+.fa-angle-right {
+  color: var(--firsatkap-yesil) !important;
+}
+a.text-primary:hover {
+  color: var(--firsatkap-yesil-acik) !important;
+}
+.btn-outline-primary {
+  color: var(--firsatkap-yesil);
+  border-color: var(--firsatkap-yesil);
+}
+.btn-outline-primary:hover {
+  color: var(--firsatkap-beyaz);
+  background-color: var(--firsatkap-yesil);
+  border-color: var(--firsatkap-yesil);
+}
+.border-primary {
+  border-color: var(--firsatkap-yesil) !important;
+}
+
+/* Dark / Lacivert (navbar, footer, kategoriler) */
+.bg-dark,
+.navbar-dark,
+.container-fluid.bg-dark {
+  background-color: var(--firsatkap-lacivert) !important;
+}
+
+/* Topbar - açık arka plan, lacivert/yeşil vurgu */
+.row.bg-light.py-3 {
+  background-color: var(--firsatkap-beyaz) !important;
+  border-bottom: 1px solid rgba(13, 33, 55, 0.08);
+}
+
+/* Section başlıkları */
+.section-title span.bg-secondary {
+  background-color: var(--firsatkap-beyaz) !important;
+  color: var(--firsatkap-lacivert);
+  border-left: 4px solid var(--firsatkap-yesil);
+}
+
+/* Carousel buton - Alışverişe Başla (anasayfa) */
+.carousel-caption .btn-outline-light {
+  border-color: var(--firsatkap-beyaz);
+  color: var(--firsatkap-beyaz);
+}
+.carousel-caption .btn-outline-light:hover {
+  background-color: var(--firsatkap-yesil);
+  border-color: var(--firsatkap-yesil);
+  color: var(--firsatkap-beyaz);
+}
+/* Carousel göstergeleri */
+.carousel-indicators li.active {
+  background-color: var(--firsatkap-yesil) !important;
+}
+.carousel-indicators li {
+  background-color: var(--firsatkap-beyaz);
+  opacity: 0.8;
+}
+
+/* Footer */
+.container-fluid.bg-dark.text-secondary {
+  background-color: var(--firsatkap-lacivert) !important;
+}
+.container-fluid.bg-dark .text-secondary {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.container-fluid.bg-dark .btn-primary {
+  background-color: var(--firsatkap-yesil) !important;
+  border-color: var(--firsatkap-yesil);
+}
+
+/* Kategoriler sol buton (Ana menü) */
+a.btn.d-flex.bg-primary.w-100 {
+  background-color: var(--firsatkap-yesil) !important;
+}
+a.btn.d-flex.bg-primary.w-100 .text-dark {
+  color: var(--firsatkap-beyaz) !important;
+}
+a.btn.d-flex.bg-primary.w-100 .fa {
+  color: var(--firsatkap-beyaz) !important;
+}
+
+/* FırsatKap yazı logosu - modern tipografi */
+.firsatkap-logo-text {
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: baseline;
+}
+.firsatkap-logo-firsat {
+  color: var(--firsatkap-lacivert);
+}
+.firsatkap-logo-kap {
+  color: var(--firsatkap-yesil);
+  margin-left: 2px;
+  position: relative;
+}
+/* Kap vurgusu: hafif alt çizgi veya kutu */
+.firsatkap-logo-kap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--firsatkap-yesil), var(--firsatkap-yesil-acik));
+  border-radius: 2px;
+  opacity: 0.5;
+}
+/* Navbar (lacivert arka plan): ilk kelime beyaz */
+.firsatkap-logo-inverse .firsatkap-logo-firsat {
+  color: var(--firsatkap-beyaz);
+}
+.firsatkap-logo-inverse .firsatkap-logo-kap {
+  color: #4ade80;
+}
+.firsatkap-logo-inverse .firsatkap-logo-kap::after {
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+}
+/* Topbar hover */
+.firsatkap-logo-link:hover .firsatkap-logo-firsat {
+  color: var(--firsatkap-lacivert-acik);
+}
+.firsatkap-logo-link:hover .firsatkap-logo-kap {
+  color: var(--firsatkap-yesil-acik);
+}
+/* Navbar mobil: biraz daha küçük */
+@media (max-width: 991.98px) {
+  .navbar .firsatkap-logo-text {
+    font-size: 1.35rem;
+  }
+  .navbar .firsatkap-logo-kap::after {
+    height: 2px;
+    bottom: 1px;
+  }
+}
+
+/* Anasayfa bölüm kartları / öne çıkan ürünler */
+.product-item.bg-light {
+  border: 1px solid rgba(13, 33, 55, 0.08);
+  background-color: var(--firsatkap-beyaz) !important;
+}
+.product-item:hover {
+  border-color: var(--firsatkap-yesil);
+  box-shadow: 0 0.25rem 0.75rem rgba(26, 127, 55, 0.15);
+}
+/* İndirim / fırsat etiketleri */
+.badge.bg-primary {
+  background-color: var(--firsatkap-yesil) !important;
+}
+/* Öne çıkan özellik kutuları (Ücretsiz Kargo vb.) - yeşil ikon, lacivert başlık */
+.d-flex.align-items-center.bg-light.mb-4 h1 {
+  color: var(--firsatkap-yesil) !important;
+}
+.d-flex.align-items-center.bg-light.mb-4 h5 {
+  color: var(--firsatkap-lacivert) !important;
+}
+.d-flex.align-items-center.bg-light.mb-4 {
+  background-color: var(--firsatkap-beyaz) !important;
+  border-left: 4px solid var(--firsatkap-yesil);
+}
+/* Kategori kartları hover */
+.cat-item:hover h6 {
+  color: var(--firsatkap-yesil) !important;
+}
+.cat-item {
+  color: var(--firsatkap-lacivert);
+}

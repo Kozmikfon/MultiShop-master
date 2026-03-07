@@ -1,0 +1,191 @@
+/* Instagram tarzı hikaye alanı - yatayda eşit yayılmış, max 15 görünür, slider ile */
+.stories-wrapper {
+  background: var(--firsatkap-beyaz, #fff);
+  padding: 0.75rem 0 1rem;
+  border-bottom: 1px solid rgba(13, 33, 55, 0.06);
+  width: 100%;
+}
+
+/* Sol ve sağ eşit boşluk; alan yatayda ortalanmış */
+.stories-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 1480px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+/* En fazla 15 hikaye görünsün: 15*(72+16)-16 = 1304px; kenarlarda beyaz fade */
+.stories-scroll-wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: 1304px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sol kenar: beyazdan şeffafa geçiş (buton yanındaki hikayelere beyazlık) */
+.stories-scroll-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  background: linear-gradient(to right, var(--firsatkap-beyaz, #fff) 0%, rgba(255, 255, 255, 0.85) 40%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Sağ kenar: beyazdan şeffafa geçiş */
+.stories-scroll-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  background: linear-gradient(to left, var(--firsatkap-beyaz, #fff) 0%, rgba(255, 255, 255, 0.85) 40%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.stories-scroll {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0 0.5rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.stories-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.story-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.story-item:hover {
+  transform: scale(1.03);
+}
+
+.story-item:active {
+  transform: scale(0.98);
+}
+
+.story-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--firsatkap-yesil, #1a7f37), #0d2137);
+  flex-shrink: 0;
+}
+
+.story-item.story-viewed .story-ring {
+  background: #dee2e6;
+}
+
+.story-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f1f3f5;
+  border: 2px solid #fff;
+  box-sizing: border-box;
+}
+
+.story-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-name {
+  font-size: 0.7rem;
+  color: var(--firsatkap-lacivert, #0d2137);
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (max-width: 992px) {
+  .stories-slider-wrap {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .story-ring {
+    width: 64px;
+    height: 64px;
+  }
+  .story-name {
+    max-width: 64px;
+    font-size: 0.65rem;
+  }
+  .stories-scroll {
+    gap: 12px;
+  }
+  .stories-slider-wrap {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .stories-slider-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.stories-slider-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.stories-slider-btn:hover {
+  background: transparent;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.stories-slider-btn:focus {
+  outline: none;
+}
+
+.stories-slider-btn i {
+  font-size: 0.75rem;
+}

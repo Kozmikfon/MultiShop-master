@@ -1,15 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MultiShop.WebUI.Controllers
 {
+    /// <summary>
+    /// Anasayfa artık React uygulamasında (http://localhost:5173). Bu adrese yönlendirir.
+    /// </summary>
     public class DefaultController : Controller
     {
+        private readonly IConfiguration _configuration;
+
+        public DefaultController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public IActionResult Index()
         {
-            ViewBag.directory1 = "MultiShop";
-            ViewBag.directory2 = "Ana Sayfa";
-            ViewBag.directory3 = "Ürün Listesi";
-            return View();
+            var reactAppUrl = _configuration["ReactAppUrl"] ?? "http://localhost:5173";
+            return Redirect(reactAppUrl);
         }
     }
 }

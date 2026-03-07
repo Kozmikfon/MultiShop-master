@@ -1,0 +1,94 @@
+/* Navbar - orijinal template ile aynı (container-fluid bg-dark, kategoriler, dropdown) */
+.navbar-wrapper.bg-dark {
+  background-color: var(--firsatkap-lacivert, #0d2137) !important;
+}
+
+.navbar-wrapper .btn.bg-primary.w-100 {
+  background-color: var(--firsatkap-yesil, #1a7f37) !important;
+  border-color: var(--firsatkap-yesil);
+}
+
+.navbar-wrapper .btn.bg-primary.w-100 .text-dark,
+.navbar-wrapper .btn.bg-primary.w-100 .fa {
+  color: #fff !important;
+}
+
+.navbar-categories-col {
+  position: relative;
+}
+
+.navbar-vertical-dropdown {
+  top: 100%;
+  left: 15px;
+  right: 15px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.navbar-vertical.navbar-light .navbar-nav .nav-link {
+  color: var(--firsatkap-lacivert, #0d2137);
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-vertical.navbar-light .navbar-nav .nav-link:hover {
+  color: var(--firsatkap-yesil, #1a7f37);
+  background-color: rgba(26, 127, 55, 0.06);
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* collapse navbar-collapse içindeki menü linkleri arası boşluk (nav-item ve nav-link aynı <a> üzerinde) */
+.navbar-wrapper .navbar-collapse .navbar-nav .nav-link {
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.navbar .dropdown .btn-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.navbar .dropdown .btn-link:hover {
+  color: #fff;
+}
+
+.navbar .dropdown-menu-show {
+  display: block;
+  position: absolute;
+  min-width: 12rem;
+}
+
+.navbar .dropdown-menu .dropdown-item {
+  color: #fff;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.badge-circle {
+  padding-bottom: 2px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 991px) {
+  .navbar-wrapper .navbar-collapse {
+    background-color: rgba(13, 33, 55, 0.98);
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+  .navbar-wrapper .dropdown-menu-show {
+    position: static;
+  }
+}

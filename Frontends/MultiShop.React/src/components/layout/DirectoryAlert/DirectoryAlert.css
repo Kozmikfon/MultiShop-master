@@ -1,0 +1,12 @@
+/* Breadcrumb / Directory Alert - orijinal template ile aynı */
+.directory-alert-wrapper .breadcrumb {
+  padding: 0.75rem 0;
+}
+
+.directory-alert-wrapper .breadcrumb-item.active {
+  color: var(--firsatkap-lacivert, #0d2137);
+}
+
+.directory-alert-wrapper .breadcrumb-item a:hover {
+  color: var(--firsatkap-yesil, #1a7f37);
+}

@@ -1,0 +1,29 @@
+/* Footer - orijinal template ile aynı (container-fluid bg-dark, firsatkap-theme ile birlikte) */
+.footer-wrapper.container-fluid.bg-dark {
+  background-color: var(--firsatkap-lacivert, #0d2137) !important;
+}
+
+.footer-wrapper .text-secondary {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.footer-wrapper .btn-primary {
+  background-color: var(--firsatkap-yesil, #1a7f37) !important;
+  border-color: var(--firsatkap-yesil);
+}
+
+.footer-wrapper .text-primary,
+.footer-wrapper .fa-angle-right,
+.footer-wrapper .fa-map-marker-alt.text-primary,
+.footer-wrapper .fa-envelope.text-primary,
+.footer-wrapper .fa-phone-alt.text-primary {
+  color: var(--firsatkap-yesil, #1a7f37) !important;
+}
+
+.footer-wrapper a.text-secondary:hover {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
