@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using MultiShop.Payment.Dtos;
 using MultiShop.Payment.Services.Abstract;
 using MultiShop.Payment.Settings;
+// Alias tanımlayarak çakışmayı önleyelim
+using IyzicoBasketItem = Iyzipay.Model.BasketItem;
 
 namespace MultiShop.Payment.Services.Concrete
 {
@@ -14,7 +16,6 @@ namespace MultiShop.Payment.Services.Concrete
 
         public IyzicoPaymentService(IOptions<IyzicoSettings> settings)
         {
-            // SOLID: Bağımlılığı dışarıdan (Options Pattern) alıyoruz
             _iyzipayOptions = new Iyzipay.Options
             {
                 ApiKey = settings.Value.ApiKey,
@@ -26,8 +27,6 @@ namespace MultiShop.Payment.Services.Concrete
         public async Task<CheckoutFormInitialize> CheckoutFormInitializeAsync(PaymentRequestDTO dto)
         {
             var request = CreateBaseRequest(dto);
-
-            // iyzico SDK'sı üzerinden formu oluşturuyoruz
             var result = await Task.Run(() => CheckoutFormInitialize.Create(request, _iyzipayOptions));
             return result;
         }
@@ -39,7 +38,6 @@ namespace MultiShop.Payment.Services.Concrete
             return result;
         }
 
-        // Helper Method: SOLID (Private metodlarla sorumluluğu bölüyoruz)
         private CreateCheckoutFormInitializeRequest CreateBaseRequest(PaymentRequestDTO dto)
         {
             var request = new CreateCheckoutFormInitializeRequest
@@ -51,7 +49,7 @@ namespace MultiShop.Payment.Services.Concrete
                 Currency = Currency.TRY.ToString(),
                 BasketId = dto.BasketId,
                 PaymentGroup = PaymentGroup.PRODUCT.ToString(),
-                CallbackUrl = "https://localhost:7076/api/Payments/Callback", // Senin Callback URL'in
+                CallbackUrl = dto.CallbackUrl,
 
                 Buyer = new Buyer
                 {
@@ -60,7 +58,7 @@ namespace MultiShop.Payment.Services.Concrete
                     Surname = dto.Surname,
                     GsmNumber = dto.GsmNumber,
                     Email = dto.Email,
-                    IdentityNumber = "11111111111", // Test TCKN
+                    IdentityNumber = "74455541011",
                     RegistrationAddress = dto.RegistrationAddress,
                     Ip = "85.100.1.1",
                     City = dto.City,
@@ -73,23 +71,45 @@ namespace MultiShop.Payment.Services.Concrete
                     ContactName = $"{dto.Name} {dto.Surname}",
                     City = dto.City,
                     Country = "Turkey",
-                    Description = string.IsNullOrEmpty(dto.RegistrationAddress) ? "Adres Bilgisi Girilmedi" : dto.RegistrationAddress,
+                    Description = dto.RegistrationAddress,
                     ZipCode = "58000"
-                },
-
-                BasketItems = new List<BasketItem>
-                {
-                    new BasketItem
-                    {
-                        Id = "B101",
-                        Name = "MultiShop Order",
-                        Category1 = "General",
-                        ItemType = BasketItemType.PHYSICAL.ToString(),
-                        Price = dto.Price.ToString().Replace(",", ".")
-                    }
                 }
             };
+
             request.ShippingAddress = request.BillingAddress;
+
+            // --- DİNAMİK SEPET İŞLEME ---
+            var basketItems = new List<IyzicoBasketItem>();
+
+            if (dto.BasketItems != null && dto.BasketItems.Any())
+            {
+                foreach (var item in dto.BasketItems)
+                {
+                    basketItems.Add(new IyzicoBasketItem
+                    {
+                        // DİKKAT: Senin DTO'ndaki isimler ProductId ve ProductName idi.
+                        Id = item.ProductId,
+                        Name = item.ProductName,
+                        Category1 = "General",
+                        ItemType = BasketItemType.PHYSICAL.ToString(),
+                        // iyzico Kuralı: Birim Fiyat * Adet
+                        Price = (item.Price * item.Quantity).ToString().Replace(",", ".")
+                    });
+                }
+            }
+            else
+            {
+                basketItems.Add(new IyzicoBasketItem
+                {
+                    Id = "DEFAULT",
+                    Name = "MultiShop Ürün Grubu",
+                    Category1 = "Genel",
+                    ItemType = BasketItemType.PHYSICAL.ToString(),
+                    Price = dto.Price.ToString().Replace(",", ".")
+                });
+            }
+
+            request.BasketItems = basketItems;
             return request;
         }
     }
