@@ -15,5 +15,6 @@ namespace MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommand
         public string SenderCustomer { get; set; }
         public int CargoCompanyId { get; set; }
         public int CargoCustomerId { get; set; }
+        public int AddressId { get; set; }
     }
 }

@@ -18,6 +18,18 @@ namespace MultiShop.Cargo.EntityLayer.Concrete
         public CargoCustomer CargoCustomer { get; set; }
         public string VendorId { get; set; }
         public int OrderingId { get; set; }
+
+        // yeni eklenen alanlar
+        public string ReceiverName { get; set; }
+        public string ReceiverSurname { get; set; }
+        public string ReceiverEmail { get; set; }
+        public string ReceiverPhone { get; set; }
+        public string ReceiverCity { get; set; }
+        public string ReceiverDistrict { get; set; }
+        public string ReceiverAddressDetail { get; set; }
+        public string? TrackingNumber { get; set; }
+        public string? ShipinkOrderId { get; set; }
+        public string? ShipinkShipmentId { get; set; }
         public CargoStatus CurrentStatus { get; set; }
     }
 }

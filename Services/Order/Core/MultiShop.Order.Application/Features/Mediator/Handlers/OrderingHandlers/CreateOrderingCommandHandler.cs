@@ -14,58 +14,73 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
 {
     public class CreateOrderingCommandHandler : IRequestHandler<CreateOrderingCommand>
     {
-        private readonly IRepository<Ordering> _repository;
+        private readonly IRepository<Ordering> _orderingRepository;
+        private readonly IRepository<Address> _addressRepository;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public CreateOrderingCommandHandler(IRepository<Ordering> repository, IHttpClientFactory httpClientFactory)
+        public CreateOrderingCommandHandler(IRepository<Ordering> repository, IHttpClientFactory httpClientFactory, IRepository<Address> address)
         {
-            _repository = repository;
+            _orderingRepository = repository;
             _httpClientFactory = httpClientFactory;
+            _addressRepository = address;
         }
 
         public async Task Handle(CreateOrderingCommand request, CancellationToken cancellationToken)
         {
-
+            // 1. ADIM: Siparişi Kendi Veritabanına Kaydet
             var ordering = new Ordering
             {
                 OrderDate = request.OrderDate,
                 TotalPrice = request.TotalPrice,
-                UserId = request.UserId
+                UserId = request.UserId,
+                AddressId = request.AddressId // Hangi adres seçildi?
             };
+            await _orderingRepository.CreateAsync(ordering);
 
-            await _repository.CreateAsync(ordering);
+            // 2. ADIM: Seçilen Adresin Detaylarını Getir (Snapshot Alıyoruz)
+            var address = await _addressRepository.GetByIdAsync(request.AddressId);
+
+            if (address == null)
+            {
+                // Adres bulunamazsa kargo süreci başlayamaz. 
+                // Burada log atılabilir ama throw yapmıyoruz ki sipariş yanmasın.
+                return;
+            }
 
             try
             {
                 var client = _httpClientFactory.CreateClient();
+
+                // 3. ADIM: Cargo Servisine Gidecek "İç Paket"i Hazırla
+                // Bu DTO, bizim Cargo mikroservisindeki tablolara dolacak.
                 var cargoDto = new CreateCargoDetailDto
                 {
-                    SenderCustomer = request.SenderCustomer,
+                    SenderCustomer = request.SenderCustomer, // Şirket adın
+                    ReceiverName = $"{address.Name} {address.Surname}", // Adres tablosundan birleştirdik
+                    ReceiverPhone = address.Phone,
+                    ReceiverEmail = address.Email,
+                    ReceiverAddress = $"{address.Detail1} {address.Detail2} {address.Description}",
+                    ReceiverCity = address.City,
+                    ReceiverDistrict = address.District,
                     Barcode = new Random().Next(100000, 999999),
                     CargoCompanyId = request.CargoCompanyId,
                     CargoCustomerId = request.CargoCustomerId,
                     VendorId = ordering.UserId,
-                    OrderingId = ordering.OrderingId
+                    OrderingId = ordering.OrderingId // Az önce kaydedilen siparişin ID'si
                 };
 
                 var jsonData = JsonSerializer.Serialize(cargoDto);
                 var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync("http://localhost:7073/api/CargoDetails", content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    // Burada log atabilirsin: "Sipariş oluştu ama kargo servisi hata döndü."                  
-                    // Console.WriteLine($"Kargo servisi hatası: {response.StatusCode}");
-                }
+                // 4. ADIM: Cargo Mikroservisine Veriyi Fırlat
+                // Bu aşamada henüz Shipink devrede değil, sadece bizim Cargo servisine veriyi emanet ediyoruz.
+                await client.PostAsync("http://localhost:7073/api/CargoDetails", content);
             }
             catch (Exception ex)
             {
-                // Kargo servisine hiç ulaşılamadı (Server kapalı vb.)
-                // Burada log atabilirsin: "Kargo servisine ulaşılamıyor."
-                // Ama 'throw' yapmıyoruz ki kullanıcı "Siparişiniz alındı" mesajını görebilsin.
+                // Kargo servisi kapalıysa veya hata verirse sipariş yine de tamamlanmış oldu.
+                // İleride buraya RabbitMQ gelecek ve bu 'try-catch'e gerek kalmayacak.
             }
-
         }
     }
 }

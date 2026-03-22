@@ -14,5 +14,15 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos
         public int CargoCustomerId { get; set; } // ID olarak alıyoruz
         public string VendorId { get; set; }
         public int OrderingId { get; set; }
+
+        // --- Yeni Eklenen Snapshot Alanları ---
+        public string ReceiverName { get; set; }
+        public string ReceiverSurname { get; set; }
+        public string ReceiverPhone { get; set; }
+        public string ReceiverEmail { get; set; }
+        public string ReceiverCity { get; set; }
+        public string ReceiverDistrict { get; set; }
+        public string ReceiverAddressDetail { get; set; }
+
     }
 }

@@ -18,6 +18,7 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos
 
         public string VendorId { get; set; }
         public int OrderingId { get; set; }
+        public string? TrackingNumber { get; set; }
         public CargoStatus CurrentStatus { get; set; }
         public string StatusDescription => CurrentStatus.ToString();
     }

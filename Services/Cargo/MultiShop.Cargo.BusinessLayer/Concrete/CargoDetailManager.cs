@@ -16,21 +16,21 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
     {
         private readonly ICargoOperationDal _cargoOperationDal;
         private readonly ICargoDetailDal _cargoDetailDal;
+        private readonly IShipinkService _shipinkService;
         private readonly IMapper _mapper;
-        public CargoDetailManager(ICargoDetailDal cargoDetailDal, IMapper mapper, ICargoOperationDal cargoOperationDal)
+        public CargoDetailManager(ICargoDetailDal cargoDetailDal, IMapper mapper, ICargoOperationDal cargoOperationDal, IShipinkService shipinkService)
         {
             _cargoDetailDal = cargoDetailDal;
             _mapper = mapper;
             _cargoOperationDal = cargoOperationDal;
+            _shipinkService = shipinkService;
         }
 
         public async Task<ResultCargoDetailDto> TChangeCargoStatus(int cargoDetailId, CargoStatus newStatus)
         {
             var cargo = await _cargoDetailDal.GetById(cargoDetailId);
-            if (cargo==null)
-            {
-                return null;
-            }
+            if (cargo == null) return null;
+
             cargo.CurrentStatus = newStatus;
             await _cargoDetailDal.Update(cargo);
 
@@ -41,6 +41,18 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
                 OperationDate = DateTime.Now,
             };
             await _cargoOperationDal.Insert(operation);
+
+            // Shipink Senkronizasyonu
+            try
+            {
+                // Enum'u string'e çevirip gönderiyoruz
+                await _shipinkService.UpdateStatusAsync(cargo.OrderingId, newStatus.ToString());
+            }
+            catch (Exception ex)
+            {
+                // Loglama...
+            }
+
             return _mapper.Map<ResultCargoDetailDto>(cargo);
         }
 
@@ -69,8 +81,28 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
 
         public async Task TInsertAsync(CreateCargoDetailDto createDto)
         {
-           var value=_mapper.Map<CargoDetail>(createDto);
+            var value = _mapper.Map<CargoDetail>(createDto);
+            value.CurrentStatus = CargoStatus.Created;
+
+            // 1. Önce kendi veritabanımıza kaydediyoruz
             await _cargoDetailDal.Insert(value);
+
+            // 2. Kayıt başarılıysa Shipink'e ilk bildirimi yapıyoruz
+            try
+            {
+                var trackingNumber = await _shipinkService.CreateShipmentAsync(value.CargoDetailId);
+
+                // 3. Eğer Shipink bir numara döndüyse, kargoyu bu numarayla güncelliyoruz
+                if (!string.IsNullOrEmpty(trackingNumber))
+                {
+                    value.TrackingNumber = trackingNumber;
+                    await _cargoDetailDal.Update(value);
+                }
+            }
+            catch (Exception ex)
+            {
+                // API hatası olsa bile kargo veritabanımızda kalır, numara boş kalır.
+            }
         }
 
         public async Task TUpdateAsync(UpdateCargoDetailDto updateDto)

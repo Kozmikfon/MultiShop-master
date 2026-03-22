@@ -15,9 +15,11 @@ namespace MultiShop.Cargo.WebApi.Controllers
     public class CargoDetailsController : ControllerBase
     {
         private readonly ICargoDetailService _CargoDetailService;
-        public CargoDetailsController(ICargoDetailService CargoDetailService)
+        private readonly IShipinkService _shipinkService;
+        public CargoDetailsController(ICargoDetailService CargoDetailService, IShipinkService shipinkService)
         {
             _CargoDetailService = CargoDetailService;
+            _shipinkService = shipinkService;
         }
 
         [HttpGet]
@@ -32,7 +34,7 @@ namespace MultiShop.Cargo.WebApi.Controllers
         {
             
             await _CargoDetailService.TInsertAsync(createCargoDetailDto);
-            return Ok("Kargo Detayları Başarıyla Oluşturuldu");
+            return Ok("Kargo Detayları Başarıyla Oluşturuldu ve işleme alındı");
         }
 
         [HttpDelete]
@@ -68,6 +70,29 @@ namespace MultiShop.Cargo.WebApi.Controllers
         {
             var values= await _CargoDetailService.TChangeCargoStatus(id, status);
             return Ok(values);
+        }
+
+        [HttpPost("CreateShipinkShipment/{id}")]
+        public async Task<IActionResult> CreateShipinkShipment(int id)
+        {
+            // Manager içindeki o iki aşamalı (Order -> Shipment) süreci tetikler
+            var trackingNumber = await _shipinkService.CreateShipmentAsync(id);
+
+            if (string.IsNullOrEmpty(trackingNumber))
+            {
+                return BadRequest("Shipink üzerinden kargo oluşturulurken bir hata oluştu.");
+            }
+
+            if (trackingNumber == "Kargo bulunamadı.")
+            {
+                return NotFound(trackingNumber);
+            }
+
+            return Ok(new
+            {
+                Message = "Shipink Kargo Süreci Başarıyla Tamamlandı",
+                TrackingNumber = trackingNumber
+            });
         }
     }
 }

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.BusinessLayer.Concrete;
 using MultiShop.Cargo.BusinessLayer.Mapping;
+using MultiShop.Cargo.BusinessLayer.Settings;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using MultiShop.Cargo.DataAccessLayer.EntityFramework;
@@ -24,8 +26,16 @@ builder.Services.AddScoped<ICargoDetailDal, EfCargoDetailDal>();
 builder.Services.AddScoped<ICargoDetailService, CargoDetailManager>();
 builder.Services.AddScoped<ICargoOperationDal, EfCargoOperationDal>();
 builder.Services.AddScoped<ICargoOperationService, CargoOperationManager>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IShipinkService, ShipinkManager>();
 
 builder.Services.AddAutoMapper(typeof(GeneralMapping));
+
+builder.Services.Configure<ShipinkSettings>(builder.Configuration.GetSection("ShipinkSettings"));
+builder.Services.AddScoped<IShipinkSettings>(sp =>
+{
+    return sp.GetRequiredService<IOptions<ShipinkSettings>>().Value;
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
