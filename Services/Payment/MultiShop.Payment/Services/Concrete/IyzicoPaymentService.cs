@@ -33,8 +33,12 @@ namespace MultiShop.Payment.Services.Concrete
 
         public async Task<CheckoutForm> GetPaymentResultAsync(string token)
         {
+            // Token ile iyzico'ya sorgu atıyoruz
             var request = new RetrieveCheckoutFormRequest { Token = token };
+
+            // Senkron metodu asenkron sarmalıyoruz (Iyzico SDK'sı senkrondur)
             var result = await Task.Run(() => CheckoutForm.Retrieve(request, _iyzipayOptions));
+
             return result;
         }
 
@@ -79,21 +83,25 @@ namespace MultiShop.Payment.Services.Concrete
             request.ShippingAddress = request.BillingAddress;
 
             // --- DİNAMİK SEPET İŞLEME ---
+            // --- DİNAMİK SEPET İŞLEME ---
+            // --- DİNAMİK SEPET İŞLEME ---
             var basketItems = new List<IyzicoBasketItem>();
 
             if (dto.BasketItems != null && dto.BasketItems.Any())
             {
                 foreach (var item in dto.BasketItems)
                 {
+                    // Eğer Quantity gönderilmemişse 1 kabul et
+                    var quantity = item.Quantity <= 0 ? 1 : item.Quantity;
+
                     basketItems.Add(new IyzicoBasketItem
                     {
-                        // DİKKAT: Senin DTO'ndaki isimler ProductId ve ProductName idi.
-                        Id = item.ProductId,
-                        Name = item.ProductName,
-                        Category1 = "General",
+                        Id = item.ProductId ?? Guid.NewGuid().ToString(),
+                        Name = item.ProductName ?? "Ürün",
+                        Category1 = item.Category1 ?? "General",
                         ItemType = BasketItemType.PHYSICAL.ToString(),
-                        // iyzico Kuralı: Birim Fiyat * Adet
-                        Price = (item.Price * item.Quantity).ToString().Replace(",", ".")
+                        // Birim fiyatı iyzico'ya gönderiyoruz
+                        Price = item.Price.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
                     });
                 }
             }

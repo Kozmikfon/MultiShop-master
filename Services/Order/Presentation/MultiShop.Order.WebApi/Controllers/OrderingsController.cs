@@ -60,5 +60,14 @@ namespace MultiShop.Order.WebApi.Controllers
             var values = await _mediator.Send(new GetOrderingByUserIdQuery(id));
             return Ok(values);
         }
+
+
+        [HttpPut("UpdatePaymentStatus")]
+        public async Task<IActionResult> UpdatePaymentStatus(UpdateOrderingPaymentStatusCommand command)
+        {
+            // Bu Command içeride ilgili siparişi bulup Status = 1 (Ödendi) yapacak
+            await _mediator.Send(command);
+            return Ok("Sipariş ödeme durumu güncellendi.");
+        }
     }
 }

@@ -7,5 +7,6 @@ namespace MultiShop.Payment.Services.Abstract
     {
         Task<CheckoutFormInitialize> CheckoutFormInitializeAsync(PaymentRequestDTO paymentRequestDTO);
         Task<CheckoutForm> GetPaymentResultAsync(string token);
+
     }
 }
