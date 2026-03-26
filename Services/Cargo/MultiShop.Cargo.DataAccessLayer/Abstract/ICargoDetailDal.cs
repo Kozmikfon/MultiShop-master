@@ -10,5 +10,6 @@ namespace MultiShop.Cargo.DataAccessLayer.Abstract
     public interface ICargoDetailDal : IGenericDal<CargoDetail>
     {
         Task<List<CargoDetail>> GetCargoDetailsByVendorId(string vendorId);
+        Task<CargoDetail> GetCargoDetailWithCompany(int cargoDetailId);
     }
 }

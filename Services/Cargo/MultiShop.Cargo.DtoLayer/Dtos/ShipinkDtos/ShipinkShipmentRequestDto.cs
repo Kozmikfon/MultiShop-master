@@ -1,26 +1,20 @@
-﻿namespace MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos
 {
     public class ShipinkShipmentRequestDto
     {
-        public string warehouse_id { get; set; }
-        public string carrier_account_id { get; set; }
-        public string carrier_service_id { get; set; }
         public string direction { get; set; } = "outgoing";
-
-        // Alıcı bilgilerini tutan yeni obje
-        public ShipinkOrderDto order { get; set; }
-
-        // Paket bilgilerini tutan liste
+        public string order_id { get; set; } // Örn: "912e71c6...:18"
+        public string carrier_service_id { get; set; } // "ptt_standart"
+        public string carrier_account_id { get; set; }
+        public string warehouse_id { get; set; }
+        public string card_id { get; set; } // Kritik: "5d0e3a74..."
         public List<ShipinkPackageDto> packages { get; set; }
-    }
-
-    public class ShipinkOrderDto
-    {
-        public string customer_order_number { get; set; } // Senin sistemindeki Sipariş No
-        public string receiver_name { get; set; }
-        public string receiver_address { get; set; }
-        public string receiver_city { get; set; }
-        public string receiver_district { get; set; }
-        public string receiver_phone { get; set; }
+        public bool create_invoice { get; set; } = false;
     }
 }

@@ -8,7 +8,7 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos
 {
     public class CarrierResult
     {
-        public string shipment_id { get; set; } // İşte bu Tracking Number (Takip No)
+        public string shipment_id { get; set; } // İşte bu bizim Takip Numaramız
         public string tracking_url { get; set; }
     }
 }

@@ -30,6 +30,12 @@ namespace MultiShop.Cargo.EntityLayer.Concrete
         public string? TrackingNumber { get; set; }
         public string? ShipinkOrderId { get; set; }
         public string? ShipinkShipmentId { get; set; }
+
+        public double Weight { get; set; } // Ağırlık (kg)
+        public int Width { get; set; }   // Genişlik (cm)
+        public int Height { get; set; }  // Yükseklik (cm)
+        public int Length { get; set; }  // Uzunluk (cm)
+
         public CargoStatus CurrentStatus { get; set; }
     }
 }

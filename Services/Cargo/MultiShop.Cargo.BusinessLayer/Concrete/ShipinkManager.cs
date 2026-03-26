@@ -2,7 +2,9 @@
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.BusinessLayer.Settings;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
+using MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
+using MultiShop.Cargo.EntityLayer.Concrete.Enums;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -26,91 +28,59 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
 
         public async Task<string> CreateShipmentAsync(int cargoDetailId)
         {
-            // 1. Veritabanından kargo detayını çek
-            var cargo = await _cargoDetailDal.GetById(cargoDetailId);
-            if (cargo == null) return "Veritabanında kargo kaydı bulunamadı.";
+            // 1. DİNAMİK VERİ: Include ile firmayı çekiyoruz (GetCargoDetailWithCompany DAL'da yazılmalı)
+            var cargo = await _cargoDetailDal.GetCargoDetailWithCompany(cargoDetailId);
+            if (cargo == null) return "Kargo kaydı bulunamadı.";
 
             var client = _httpClientFactory.CreateClient();
             var token = await GetAccessTokenAsync();
-            if (string.IsNullOrEmpty(token)) return "Shipink yetkilendirme hatası (Token alınamadı).";
-            
+            if (string.IsNullOrEmpty(token)) return "Yetkilendirme hatası.";
+
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            // 2. EMBEDDED PAYLOAD: Sipariş ve Kargo Bilgileri Tek Pakette
-            // Bu yöntem "order_id bulunamadı" hatasını kökten çözer.
-            var shipmentRequest = new
+            // 2. TEMİZ VE DİNAMİK PAYLOAD: Postman'da çalışan en sade yapı
+            var shipmentRequest = new ShipinkShipmentRequestDto
             {
-                order = new
-                {
-                    external_id = cargo.OrderingId.ToString(), 
-                    customer = new
-                    {
-                        name = $"{cargo.ReceiverName} {cargo.ReceiverSurname}",
-                        email = new { main = cargo.ReceiverEmail },
-                        phone = new { main = cargo.ReceiverPhone },
-                        address = new
-                        {
-                            street = cargo.ReceiverAddressDetail,
-                            city = cargo.ReceiverCity,
-                            state = cargo.ReceiverCity,
-                            zip = "34000", 
-                            country_code = "TR"
-                        }
-                    },
-                    items = new List<object> {
-                        new {
-                            name = "Sipariş No: " + cargo.OrderingId,
-                            quantity = 1,
-                            price = 1 
-                        }
-                    },
-                    price = 1,
-                    currency = "TRY"
-                },
-                carrier_service_id = _settings.CarrierServiceId,
-                carrier_account_id = _settings.CarrierAccountId,
+                order_id = $"{cargo.OrderingId}-{cargo.CargoDetailId}",
+                carrier_account_id = cargo.CargoCompany.CarrierAccountId, // DB'den gelen dinamik ID
+                carrier_service_id = cargo.CargoCompany.CarrierServiceId, // DB'den gelen dinamik Servis
                 warehouse_id = _settings.WarehouseId,
-                direction = "outgoing",
-                packages = new List<object>
-                {
-                    new { weight = 1, weight_unit = "kg" }
-                }
+                card_id = _settings.CardId, // Postman testimizdeki kritik alan
+                packages = new List<ShipinkPackageDto>
+        {
+            new ShipinkPackageDto
+            {
+                weight = cargo.Weight > 0 ? cargo.Weight : 1.0,
+                width = cargo.Width > 0 ? cargo.Width : 10,
+                height = cargo.Height > 0 ? cargo.Height : 10,
+                length = cargo.Length > 0 ? cargo.Length : 10
+            }
+        }
             };
 
-            // 3. İstek Gönder
+            // 3. İSTEK GÖNDER (Artık DTO ile çok daha temiz)
             var response = await client.PostAsJsonAsync($"{_settings.BaseUrl}/shipments", shipmentRequest);
-            var resultText = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                return $"HATA DETAYI: {resultText}";
+                var error = await response.Content.ReadAsStringAsync();
+                return $"Shipink Hatası: {error}";
             }
 
-            // 4. BAŞARILI: Takip numarasını yakala ve DB'ye yaz
-            try 
+            // 4. BAŞARILI: Tip güvenli şekilde veriyi okuyoruz
+            var result = await response.Content.ReadFromJsonAsync<ShipinkShipmentResponseDto>();
+
+            if (result != null && result.success)
             {
-                var resultJson = JsonSerializer.Deserialize<JsonElement>(resultText);
-                var data = resultJson.GetProperty("data");
-
-                // Shipink'in kendi ID'lerini ve takip numarasını alıyoruz
-                string shipinkOrderId = data.GetProperty("order_id").GetString();
-                string shipinkShipmentId = data.GetProperty("id").GetString();
-                string trackingNumber = data.GetProperty("carrier").GetProperty("shipment_id").GetString();
-
-                // Entity güncelleme
-                cargo.ShipinkOrderId = shipinkOrderId;
-                cargo.ShipinkShipmentId = shipinkShipmentId;
-                cargo.TrackingNumber = trackingNumber;
-                //cargo.StatusDescription = "Kargo Hazırlandı / Takip No Alındı";
+                cargo.TrackingNumber = result.data.carrier.shipment_id;
+                cargo.ShipinkShipmentId = result.data.id;
+                cargo.CurrentStatus = CargoStatus.LabelCreated; // Enum kullanımı
 
                 await _cargoDetailDal.Update(cargo);
+                return $"Başarılı! Takip No: {cargo.TrackingNumber}";
+            }
 
-                return $"Başarılı! Takip No: {trackingNumber}";
-            }
-            catch (Exception ex)
-            {
-                return $"Kargo oluştu ama DB güncellenemedi: {ex.Message}. Yanıt: {resultText}";
-            }
+            return "İşlem başarılı dendi ama veri okunamadı.";
         }
 
         private async Task<string> GetAccessTokenAsync()

@@ -12,5 +12,7 @@ namespace MultiShop.Cargo.BusinessLayer.Settings
         public string WarehouseId { get; set; }
         public string CarrierAccountId { get; set; }
         public string CarrierServiceId { get; set; }
+
+        string CardId { get; set; }
     }
 }

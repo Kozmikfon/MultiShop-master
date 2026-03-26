@@ -24,5 +24,12 @@ namespace MultiShop.Cargo.DataAccessLayer.EntityFramework
         {
             return await _cargoContext.CargoDetails.Where(x=>x.VendorId== vendorId).ToListAsync();
         }
+
+        public async Task<CargoDetail> GetCargoDetailWithCompany(int cargoDetailId)
+        {
+            return await _cargoContext.CargoDetails
+             .Include(x => x.CargoCompany) // Kritik nokta: Company nesnesi null gelmesin diye
+             .FirstOrDefaultAsync(x => x.CargoDetailId == cargoDetailId);
+        }
     }
 }

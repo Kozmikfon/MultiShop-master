@@ -8,7 +8,10 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos
 {
     public class ShipinkShipmentResponseDto
     {
-        public string id { get; set; } // Gönderi ID'si
-        public CarrierResult carrier { get; set; }
+        public bool success { get; set; }
+
+        public string message { get; set; }
+        public ShipinkDataDto data { get; set; }
     }
+
 }
