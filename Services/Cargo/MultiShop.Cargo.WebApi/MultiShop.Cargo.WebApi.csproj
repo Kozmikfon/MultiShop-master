@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\MultiShop.Shared\MultiShop.Shared.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.BusinessLayer\MultiShop.Cargo.BusinessLayer.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.DataAccessLayer\MultiShop.Cargo.DataAccessLayer.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.DtoLayer\MultiShop.Cargo.DtoLayer.csproj" />

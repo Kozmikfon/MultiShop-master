@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\Cargo\MultiShop.Cargo.DataAccessLayer\MultiShop.Cargo.DataAccessLayer.csproj" />
     <ProjectReference Include="..\..\Cargo\MultiShop.Cargo.DtoLayer\MultiShop.Cargo.DtoLayer.csproj" />
     <ProjectReference Include="..\..\Cargo\MultiShop.Cargo.EntityLayer\MultiShop.Cargo.EntityLayer.csproj" />
+    <ProjectReference Include="..\..\Shared\MultiShop.Shared\MultiShop.Shared.csproj" />
   </ItemGroup>
 
 </Project>
