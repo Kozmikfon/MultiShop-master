@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiShop.Order.Domain.Entities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace MultiShop.Order.Domain.Entities
         public decimal TotalPrice { get; set; }
         public DateTime OrderDate { get; set; }
         public int AddressId { get; set; }
+        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
         public List<OrderDetail> OrderDetails { get; set; }
     }
 }
