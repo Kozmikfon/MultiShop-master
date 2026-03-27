@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using MultiShop.Cargo.BusinessLayer.Abstract;
@@ -7,6 +8,7 @@ using MultiShop.Cargo.BusinessLayer.Settings;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using MultiShop.Cargo.DataAccessLayer.EntityFramework;
+using MultiShop.Cargo.WebApi.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,30 @@ builder.Services.AddScoped<IShipinkSettings>(sp =>
 {
     return sp.GetRequiredService<IOptions<ShipinkSettings>>().Value;
 });
+
+// 3. MASSTRANSIT & RABBITMQ AYARLARI
+builder.Services.AddMassTransit(x =>
+{
+    // Consumer'ý MassTransit'e tanýtýyoruz
+    x.AddConsumer<OrderPaidConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        // Docker kullanýyorsan "rabbitmq" veya yereldeysen "localhost"
+        cfg.Host(builder.Configuration["RabbitMQUrl"] ?? "rabbitmq://localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        // Kuyruk adýný ve dinleyecek Consumer'ý eþleþtiriyoruz
+        cfg.ReceiveEndpoint("order-paid-queue", e =>
+        {
+            e.ConfigureConsumer<OrderPaidConsumer>(context);
+        });
+    });
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
