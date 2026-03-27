@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MultiShop.Order.Application.Features.CQRS.Handlers.AddressHandlers;
 using MultiShop.Order.Application.Features.CQRS.Handlers.OrderDetailHandlers;
@@ -38,6 +39,25 @@ builder.Services.AddScoped<RemoveOrderDetailCommandHandler>();
 builder.Services.AddScoped<GetOrderDetailByVendorIdQueryHandler>();
 #endregion
 
+
+// 1. MASSTRANSIT VE RABBITMQ KAYDI (BURASI EKSÝK)
+builder.Services.AddMassTransit(x =>
+{
+    // Order tarafý genellikle sadece mesaj fýrlatýr (Publisher), 
+    // Bu yüzden burada Consumer eklememize gerek yok (o Cargo tarafýnda).
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        // AppSettings'teki URL'i kullanýyoruz
+        cfg.Host(builder.Configuration["RabbitMQUrl"] ?? "rabbitmq://localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+    });
+});
+
+// 2. MediatR veya Application Service kayýtlarýnýn altýnda durabilir
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

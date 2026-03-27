@@ -9,6 +9,8 @@ using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Concrete;
 using MultiShop.Cargo.DataAccessLayer.EntityFramework;
 using MultiShop.Cargo.WebApi.Consumers;
+using MultiShop.Shared.Constants;
+using MultiShop.Shared.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,22 +44,28 @@ builder.Services.AddScoped<IShipinkSettings>(sp =>
 // 3. MASSTRANSIT & RABBITMQ AYARLARI
 builder.Services.AddMassTransit(x =>
 {
-    // Consumer'ý MassTransit'e tanýtýyoruz
+    // 1. Consumer'ý MassTransit'e kaydediyoruz
     x.AddConsumer<OrderPaidConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        // Docker kullanýyorsan "rabbitmq" veya yereldeysen "localhost"
+        // 2. RabbitMQ Baðlantý Ayarlarý
         cfg.Host(builder.Configuration["RabbitMQUrl"] ?? "rabbitmq://localhost", h =>
         {
             h.Username("guest");
             h.Password("guest");
         });
 
-        // Kuyruk adýný ve dinleyecek Consumer'ý eþleþtiriyoruz
-        cfg.ReceiveEndpoint("order-paid-queue", e =>
+        // 3. Kuyruk ve Mesaj Eþleþtirmesi (Topology)
+        // Sabit üzerinden kuyruk adýný veriyoruz: "order-paid-queue"
+        cfg.ReceiveEndpoint(RabbitMQConstants.OrderPaidQueue, e =>
         {
+            // Bu kuyruðu dinleyecek sýnýfý baðlýyoruz
             e.ConfigureConsumer<OrderPaidConsumer>(context);
+
+            // KRÝTÝK: IOrderPaidEvent tipindeki mesajlarý bu kuyruða yönlendiriyoruz.
+            // Bu sayede RabbitMQ üzerinde Exchange ve Queue baðlantýsý otomatik kurulur.
+            e.Bind<IOrderPaidEvent>();
         });
     });
 });
