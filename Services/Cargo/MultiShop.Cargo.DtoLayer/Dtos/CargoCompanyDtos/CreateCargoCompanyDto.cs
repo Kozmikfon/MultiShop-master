@@ -9,5 +9,7 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.CargoCompanyDtos
     public class CreateCargoCompanyDto
     {
         public string CargoCompanyName { get; set; }
+        public string CarrierAccountId { get; set; }
+        public string CarrierServiceId { get; set; }
     }
 }

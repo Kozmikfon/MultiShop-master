@@ -10,5 +10,7 @@ namespace MultiShop.Cargo.DtoLayer.Dtos.CargoCompanyDtos
     {
         public int CargoCompanyId { get; set; }
         public string CargoCompanyName { get; set; }
+        public string CarrierAccountId { get; set; }
+        public string CarrierServiceId { get; set; }
     }
 }
