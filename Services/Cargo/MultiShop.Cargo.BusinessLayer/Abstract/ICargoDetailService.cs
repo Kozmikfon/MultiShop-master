@@ -13,5 +13,7 @@ namespace MultiShop.Cargo.BusinessLayer.Abstract
     {
         Task<List<ResultCargoDetailDto>> TGetCargoDetailsByVendorId(string vendorId);
         Task <ResultCargoDetailDto> TChangeCargoStatus(int cargoDetailId, CargoStatus newStatus);
+        // Controller'ın çağıracağı temiz metot
+        Task<string> TCreateShipmentProcessAsync(int cargoDetailId);
     }
 }

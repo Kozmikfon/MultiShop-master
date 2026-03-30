@@ -11,5 +11,6 @@ namespace MultiShop.Cargo.DataAccessLayer.Abstract
     {
         Task<List<CargoDetail>> GetCargoDetailsByVendorId(string vendorId);
         Task<CargoDetail> GetCargoDetailWithCompany(int cargoDetailId);
+        
     }
 }

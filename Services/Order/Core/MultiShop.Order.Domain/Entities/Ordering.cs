@@ -14,6 +14,7 @@ namespace MultiShop.Order.Domain.Entities
         public decimal TotalPrice { get; set; }
         public DateTime OrderDate { get; set; }
         public int AddressId { get; set; }
+        public string ShipinkOrderId { get; set; }
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
         public List<OrderDetail> OrderDetails { get; set; }
     }

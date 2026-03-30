@@ -46,7 +46,7 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             try
             {
                 // Enum'u string'e çevirip gönderiyoruz
-                await _shipinkService.UpdateStatusAsync(cargo.OrderingId, newStatus.ToString());
+                await _shipinkService.UpdateStatusAsync(cargo.ShipinkOrderId, newStatus.ToString());
             }
             catch (Exception ex)
             {
@@ -87,6 +87,8 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             // 1. Önce kendi veritabanımıza kaydediyoruz
             await _cargoDetailDal.Insert(value);
 
+            Console.WriteLine($">>>>> YENİ KARGO ID: {value.CargoDetailId}");
+
             // 2. Kayıt başarılıysa Shipink'e ilk bildirimi yapıyoruz
             try
             {
@@ -96,12 +98,16 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
                 if (!string.IsNullOrEmpty(trackingNumber))
                 {
                     value.TrackingNumber = trackingNumber;
+                    value.CurrentStatus = CargoStatus.LabelCreated;
+
                     await _cargoDetailDal.Update(value);
+                    Console.WriteLine("✅ SHIPINK TAKİP NO ALINDI: " + trackingNumber);
                 }
             }
             catch (Exception ex)
             {
                 // API hatası olsa bile kargo veritabanımızda kalır, numara boş kalır.
+                Console.WriteLine($">>>>> SHIPINK API HATASI: {ex.Message}");
             }
         }
 
@@ -109,6 +115,30 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
         {
             var value = _mapper.Map<CargoDetail>(updateDto);
             await _cargoDetailDal.Update(value);
+        }
+
+        public async Task<string> TCreateShipmentProcessAsync(int cargoDetailId)
+        {
+            // 1. Veriyi ilişkileriyle birlikte çek (Kötü kod: Tekrar tekrar DB'ye gitme)
+            var cargo = await _cargoDetailDal.GetCargoDetailWithCompany(cargoDetailId);
+
+            if (cargo == null)
+                return "Hata: Kargo kaydı veritabanında bulunamadı.";
+
+            if (cargo.CargoCompany == null)
+                return "Hata: Kargoya atanmış geçerli bir taşıyıcı firma (Company) bulunamadı.";
+
+            // 2. Shipink Servisini Çağır (Zaten CargoDetail nesnesi alan versiyonu yazmıştık)
+            // Bu metot kendi içinde Update işlemini de yapacak.
+            try
+            {
+                var result = await _shipinkService.CreateShipmentAsync(cargoDetailId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return $"Shipink İşlem Hatası: {ex.Message}";
+            }
         }
     }
 }

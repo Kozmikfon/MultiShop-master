@@ -22,6 +22,10 @@ builder.Services.AddDbContext<OrderContext>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IOrderingRepository), typeof(OrderingRepository));
 builder.Services.AddScoped(typeof(IOrderDetailRepository),typeof(OrderDetailRepository));
+
+builder.Services.AddScoped<IShipinkService, ShipinkManager>();
+
+
 builder.Services.AddApplicationService(builder.Configuration);
 
 #region

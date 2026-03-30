@@ -39,23 +39,28 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // 2. TEMİZ VE DİNAMİK PAYLOAD: Postman'da çalışan en sade yapı
+            // 2. TEMİZ VE DİNAMİK PAYLOAD: JSON formatına tam uyum sağlayan hali
             var shipmentRequest = new ShipinkShipmentRequestDto
             {
-                order_id = $"{cargo.OrderingId}-{cargo.CargoDetailId}",
-                carrier_account_id = cargo.CargoCompany.CarrierAccountId, // DB'den gelen dinamik ID
-                carrier_service_id = cargo.CargoCompany.CarrierServiceId, // DB'den gelen dinamik Servis
+                direction = "outgoing", // 👈 Eksik olan kritik alan
+                order_id = cargo.ShipinkOrderId, // 👈 Shipink'teki Sipariş ID'si (Guid olan)
+                carrier_account_id = cargo.CargoCompany.CarrierAccountId,
+                carrier_service_id = cargo.CargoCompany.CarrierServiceId,
                 warehouse_id = _settings.WarehouseId,
-                card_id = _settings.CardId, // Postman testimizdeki kritik alan
+                card_id = _settings.CardId,
+                create_invoice = false, // 👈 Eksik alan
                 packages = new List<ShipinkPackageDto>
-        {
-            new ShipinkPackageDto
-            {
-                weight = cargo.Weight > 0 ? cargo.Weight : 1.0,
-                width = cargo.Width > 0 ? cargo.Width : 10,
-                height = cargo.Height > 0 ? cargo.Height : 10,
-                length = cargo.Length > 0 ? cargo.Length : 10
-            }
-        }
+                {   
+                new ShipinkPackageDto
+                {
+                    dimension_unit = "cm", // 👈 Eksik alan
+                    weight_unit = "kg",    // 👈 Eksik alan
+                    weight = cargo.Weight > 0 ? cargo.Weight : 1.0,
+                    width = cargo.Width > 0 ? cargo.Width : 15,
+                    height = cargo.Height > 0 ? cargo.Height : 10,
+                    length = cargo.Length > 0 ? cargo.Length : 20
+                }
+                }
             };
 
             // 3. İSTEK GÖNDER (Artık DTO ile çok daha temiz)
@@ -98,10 +103,10 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             return null;
         }
 
-        public async Task<bool> UpdateStatusAsync(int orderingId, string newStatus)
+        public async Task<bool> UpdateStatusAsync(string shipinkId, string newStatus)
         {
             var client = _httpClientFactory.CreateClient();
-            var response = await client.PatchAsJsonAsync($"{_settings.BaseUrl}/shipments/{orderingId}/status", new { status = newStatus });
+            var response = await client.PatchAsJsonAsync($"{_settings.BaseUrl}/shipments/{shipinkId}/status", new { status = newStatus });
             return response.IsSuccessStatusCode;
         }
     }

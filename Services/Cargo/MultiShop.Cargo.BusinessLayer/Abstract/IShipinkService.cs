@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiShop.Cargo.EntityLayer.Concrete;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,6 @@ namespace MultiShop.Cargo.BusinessLayer.Abstract
         Task<string> CreateShipmentAsync(int cargoDetailId);
 
         // Durum değişikliklerini Shipink'e bildirme
-        Task<bool> UpdateStatusAsync(int orderingId, string newStatus);
+        Task<bool> UpdateStatusAsync(string shipinkId, string newStatus);
     }
 }

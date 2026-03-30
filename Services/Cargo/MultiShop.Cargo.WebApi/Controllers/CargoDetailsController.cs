@@ -30,11 +30,19 @@ namespace MultiShop.Cargo.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCargoDetail(CreateCargoDetailDto createCargoDetailDto)
+        public async Task<IActionResult> CreateCargoDetail([FromBody]  CreateCargoDetailDto createCargoDetailDto)
         {
-            
-            await _CargoDetailService.TInsertAsync(createCargoDetailDto);
-            return Ok("Kargo Detayları Başarıyla Oluşturuldu ve işleme alındı");
+
+            try
+            {
+                await _CargoDetailService.TInsertAsync(createCargoDetailDto);
+                return Ok("Kargo başarıyla oluşturuldu.");
+            }
+            catch (Exception ex)
+            {
+                // İŞTE BURASI! Hatayı buradan okuyacağız.
+                return BadRequest($"Kargo Oluşturulurken Hata: {ex.Message} -> {ex.InnerException?.Message}");
+            }
         }
 
         [HttpDelete]
@@ -75,24 +83,16 @@ namespace MultiShop.Cargo.WebApi.Controllers
         [HttpPost("CreateShipinkShipment/{id}")]
         public async Task<IActionResult> CreateShipinkShipment(int id)
         {
-            // Manager içindeki o iki aşamalı (Order -> Shipment) süreci tetikler
-            var trackingNumber = await _shipinkService.CreateShipmentAsync(id);
+            // Tek satır, tertemiz iş mantığı!
+            var result = await _CargoDetailService.TCreateShipmentProcessAsync(id);
 
-            if (string.IsNullOrEmpty(trackingNumber))
+            // Sonuç kontrolü (İşlem başarılı mı, hata mı döndü?)
+            if (result.Contains("Hata") || result.Contains("bulunamadı"))
             {
-                return BadRequest("Shipink üzerinden kargo oluşturulurken bir hata oluştu.");
+                return BadRequest(new { Success = false, Message = result });
             }
 
-            if (trackingNumber == "Kargo bulunamadı.")
-            {
-                return NotFound(trackingNumber);
-            }
-
-            return Ok(new
-            {
-                Message = "Shipink Kargo Süreci Başarıyla Tamamlandı",
-                TrackingNumber = trackingNumber
-            });
+            return Ok(new { Success = true, Message = "Kargo Süreci Başarıyla Tamamlandı", Details = result });
         }
     }
 }

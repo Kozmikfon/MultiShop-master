@@ -21,38 +21,52 @@ namespace MultiShop.Cargo.WebApi.Consumers
         // DİKKAT: Buraya 'async' ekledik!
         public async Task Consume(ConsumeContext<IOrderPaidEvent> context)
         {
+            Console.WriteLine(">>>>>>>>> MESAJ CARGO SERVİSİNE ULAŞTI! <<<<<<<<<");
+            Console.WriteLine($"Sipariş ID: {context.Message.OrderingId}");
+            // 1. Gelen mesajı kargo nesnesine çevir (Mapping)
             var cargoDetail = new CargoDetail
             {
+                // Temel Bilgiler
                 OrderingId = context.Message.OrderingId,
+                VendorId = "3" ?? "VND-DEFAULT", // SQL Hatasını önler
+                SenderCustomer = "MultiShop Genel Depo",            // SQL Hatasını önler
+                Barcode = $"BRK-{context.Message.OrderingId}-{DateTime.Now.Ticks.ToString().Substring(12)}",
+
+                // Alıcı Bilgileri (Hata veren yerler buralardı)
                 ReceiverName = context.Message.ReceiverName,
                 ReceiverSurname = context.Message.ReceiverSurname,
-                ReceiverEmail = context.Message.ReceiverEmail,
-                ReceiverPhone = context.Message.ReceiverPhone,
-                ReceiverCity = context.Message.ReceiverCity,
-                ReceiverDistrict = context.Message.ReceiverDistrict,
-                ReceiverAddressDetail = context.Message.ReceiverAddressDetail,
-                CargoCompanyId = context.Message.CargoCompanyId,
-                CurrentStatus = CargoStatus.Created,
-                Weight = 1.0,
-                Width = 10,
-                Height = 10,
-                Length = 10,
-                // Değişken ismini düzelttik: _cargoDetaildal
-                Barcode = "BRK-" + context.Message.OrderingId + "-" + DateTime.Now.Ticks.ToString().Substring(10)
-            };
+                ReceiverEmail = context.Message.ReceiverEmail ?? "musteri@mail.com",
+                ReceiverPhone = context.Message.ReceiverPhone ?? "05550000000",
+                ReceiverCity = context.Message.ReceiverCity ?? "Ankara",
+                ReceiverDistrict = context.Message.ReceiverDistrict ?? "Merkez",
+                ReceiverAddressDetail = context.Message.ReceiverAddressDetail ?? "Adres Bilgisi Yok",
 
-            // await kullandık
-            await _cargoDetaildal.Insert(cargoDetail);
+                // Boyut Bilgileri (Shipink'in istediği kısımlar)
+                Weight = 1.0,
+                Width = 15,
+                Height = 10,
+                Length = 20,
+
+                // Durum ve Şirket
+                CargoCompanyId = 1, // PTT vb.
+                CargoCustomerId = 1,
+                CurrentStatus = CargoStatus.Created
+            };
 
             try
             {
-                // Shipink tetikleme
-                await _shipinkService.CreateShipmentAsync(cargoDetail.CargoDetailId);
+                // 2. Önce Kargo DB'sine kaydet
+                await _cargoDetaildal.Insert(cargoDetail);
+                Console.WriteLine($"✅ Adım 1: Kargo DB kaydı başarılı. ID: {cargoDetail.CargoDetailId}");
+
+                // 3. Shipink Sürecini Başlat (Daha önce yazdığımız o temiz Manager metodunu çağır)
+                var result = await _shipinkService.CreateShipmentAsync(cargoDetail.CargoDetailId);
+                Console.WriteLine($"🚀 Adım 2: Shipink Otomasyonu Tamamlandı: {result}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Shipink Hatası: {ex.Message}");
-                throw;
+                Console.WriteLine($"❌ Hata: Otomasyon zinciri kırıldı! {ex.Message}");
+                throw; // RabbitMQ mesajı hata kuyruğuna atsın
             }
         }
     }

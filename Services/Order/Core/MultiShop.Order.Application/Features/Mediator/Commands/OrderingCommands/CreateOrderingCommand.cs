@@ -1,20 +1,22 @@
-﻿using MediatR;
+﻿    using MediatR;
+using MultiShop.Order.Application.Features.CQRS.Commands.OrderDetailCommands;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-namespace MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands
-{
-    public class CreateOrderingCommand : IRequest
+    namespace MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands
     {
-        public string UserId { get; set; }
-        public decimal TotalPrice { get; set; }
-        public DateTime OrderDate { get; set; }
-        public string SenderCustomer { get; set; }
-        public int CargoCompanyId { get; set; }
-        public int CargoCustomerId { get; set; }
-        public int AddressId { get; set; }
+        public class CreateOrderingCommand : IRequest
+        {
+            public string UserId { get; set; }
+            public decimal TotalPrice { get; set; }
+            public DateTime OrderDate { get; set; }
+            public string SenderCustomer { get; set; }
+            public int CargoCompanyId { get; set; }
+            public int CargoCustomerId { get; set; }
+            public int AddressId { get; set; }
+            public List<CreateOrderDetailCommand> OrderDetails { get; set; }
     }
-}
+    }
