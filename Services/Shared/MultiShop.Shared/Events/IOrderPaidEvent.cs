@@ -20,6 +20,8 @@ namespace MultiShop.Shared.Events
         int CargoCompanyId { get; }
         int CargoCustomerId { get; }
 
+        string SenderCustomer { get; }
+
         double Weight { get; }
         int Width { get; }
         int Height { get; }

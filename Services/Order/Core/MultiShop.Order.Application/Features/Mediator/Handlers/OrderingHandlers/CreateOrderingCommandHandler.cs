@@ -84,13 +84,16 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
 
                     // Shipink UUID'leri
                     ShipinkOrderId = shipinkId,
-
+                    SenderCustomer=request.SenderCustomer,
                     // Varsayılan Kargo Bilgileri
                     CargoCompanyId = request.CargoCompanyId != 0 ? request.CargoCompanyId : 3005,
-                    Weight = 1.0,
-                    Width = 10,
-                    Height = 10,
-                    Length = 10
+                    CargoCustomerId= request.CargoCustomerId,
+                    VendorId=request.VendorId,
+                    Weight = request.Weight,
+                    Width = request.Width,
+                    Height = request.Height,
+                    Length = request.Length,
+                    
                 }, cancellationToken);
 
                 Console.WriteLine($">>>>> ORDER {ordering.OrderingId} OLUŞTURULDU VE RABBITMQ'YA FIRLATILDI! <<<<<");

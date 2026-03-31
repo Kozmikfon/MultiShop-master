@@ -13,10 +13,18 @@ using System;
             public string UserId { get; set; }
             public decimal TotalPrice { get; set; }
             public DateTime OrderDate { get; set; }
+
             public string SenderCustomer { get; set; }
             public int CargoCompanyId { get; set; }
             public int CargoCustomerId { get; set; }
+
             public int AddressId { get; set; }
+            public double Weight { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public int Length { get; set; }
+
+            public string VendorId { get; set; }
             public List<CreateOrderDetailCommand> OrderDetails { get; set; }
     }
     }
