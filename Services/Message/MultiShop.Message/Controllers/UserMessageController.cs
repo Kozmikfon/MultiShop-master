@@ -10,6 +10,7 @@ namespace MultiShop.Message.Controllers
     public class UserMessageController : ControllerBase
     {
         private readonly IUserMessageService _userMessageService;
+
         public UserMessageController(IUserMessageService userMessageService)
         {
             _userMessageService = userMessageService;
@@ -57,17 +58,18 @@ namespace MultiShop.Message.Controllers
             return Ok("Mesaj başarıyla güncellendi");
         }
 
-        [HttpGet("GetTotalMessageCount")]
-        public async Task<IActionResult> GetTotalMessageCount()
-        {
-            int values = await _userMessageService.GetTotalMessageCount();
-            return Ok(values);
-        }
-
+        // 🔥 UI TARAFINDAKİ GetTotalMessageCountByReceiverId BURAYI ÇAĞIRACAK 🔥
         [HttpGet("GetTotalMessageCountByReceiverId")]
         public async Task<IActionResult> GetTotalMessageCountByReceiverId(string id)
         {
             int values = await _userMessageService.GetTotalMessageCountByReceiverId(id);
+            return Ok(values);
+        }
+
+        [HttpGet("GetTotalMessageCount")]
+        public async Task<IActionResult> GetTotalMessageCount()
+        {
+            int values = await _userMessageService.GetTotalMessageCount();
             return Ok(values);
         }
     }

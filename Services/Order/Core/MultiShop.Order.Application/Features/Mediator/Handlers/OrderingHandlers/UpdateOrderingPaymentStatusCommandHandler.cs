@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Transports;
 using MediatR;
 using MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands;
 using MultiShop.Order.Application.Interfaces;
@@ -26,40 +27,44 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
 
         public async Task Handle(UpdateOrderingPaymentStatusCommand request, CancellationToken cancellationToken)
         {
-            if (int.TryParse(request.BasketId, out int orderingId))
+            // 1. ID Dönüşümü (Eğer veritabanında int ise parse etmeliyiz)
+            if (!int.TryParse(request.OrderingId, out int orderId)) return;
+
+            var values = await _repository.GetByIdAsync(orderId);
+            if (values == null) return;
+
+            // 2. Ödeme durumunu güncelle
+            values.PaymentStatus = PaymentStatus.Completed;
+            await _repository.UpdateAsync(values);
+
+            // 3. Adres bilgilerini getir
+            var address = await _addressRepository.GetByIdAsync(values.AddressId);
+
+            // 4. 🔥 ASIL OLAY: Cargo Servisini Tetikle 🔥
+            // Shared kütüphanendeki IOrderPaidEvent property isimleriyle birebir aynı olmalı!
+            await _publishEndpoint.Publish<IOrderPaidEvent>(new
             {
-                var values = await _repository.GetByIdAsync(orderingId);
+                OrderingId = values.OrderingId,
+                // EĞER IOrderPaidEvent içinde 'ShipinkOrderId' yoksa burayı silebilirsin 
+                // veya interface'e ekleyebilirsin.
 
-                if (values != null)
-                {
-                    // 1. Durumu senin yeni Enum'ınla güncelle
-                    values.PaymentStatus = request.IsPaid ? PaymentStatus.Completed : PaymentStatus.Failed;
-                    await _repository.UpdateAsync(values);
+                ReceiverName = address.Name,
+                ReceiverSurname = address.Surname,
+                ReceiverEmail = address.Email,
+                ReceiverPhone = address.Phone,
+                ReceiverCity = address.City,
+                ReceiverDistrict = address.District,
+                ReceiverAddressDetail = address.Detail1,
 
-                    // 2. Eğer ödeme başarılıysa Kargo mesajını fırlat
-                    if (request.IsPaid)
-                    {
-                        // Adres detaylarını getir (Kargo için şart)
-                        var address = await _addressRepository.GetByIdAsync(values.AddressId);
+                CargoCompanyId = 3005,
+                CargoCustomerId = 1, // Interface'de varsa eklemeyi unutma
+                Weight = 1.0,
+                Width = 10,
+                Height = 10,
+                Length = 10
+            });
 
-                        if (address != null)
-                        {
-                            await _publishEndpoint.Publish<IOrderPaidEvent>(new
-                            {
-                                OrderingId = values.OrderingId,
-                                ReceiverName = address.Name,
-                                ReceiverSurname = address.Surname,
-                                ReceiverEmail = address.Email,
-                                ReceiverPhone = address.Phone,
-                                ReceiverCity = address.City,
-                                ReceiverDistrict = address.District,
-                                ReceiverAddressDetail = $"{address.Detail1} {address.Detail2} {address.Description}",
-                                CargoCompanyId = 1 // Şimdilik varsayılan PTT
-                            }, cancellationToken);
-                        }
-                    }
-                }
-            }
+            Console.WriteLine($">>>>> SİPARİŞ {values.OrderingId} ÖDENDİ. EVENT FIRLATILDI! <<<<<");
         }
     }
 }

@@ -9,7 +9,7 @@ namespace MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommand
 {
     public class UpdateOrderingPaymentStatusCommand:IRequest
     {
-        public string BasketId { get; set; }
+        public string OrderingId { get; set; }
 
         // Ödeme başarılı mı?
         public bool IsPaid { get; set; }

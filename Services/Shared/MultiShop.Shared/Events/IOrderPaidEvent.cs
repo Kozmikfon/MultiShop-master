@@ -18,5 +18,11 @@ namespace MultiShop.Shared.Events
         string ReceiverAddressDetail { get; }
         // Shipink için lazım olacak kargo firması ID'si
         int CargoCompanyId { get; }
+        int CargoCustomerId { get; }
+
+        double Weight { get; }
+        int Width { get; }
+        int Height { get; }
+        int Length { get; }
     }
 }

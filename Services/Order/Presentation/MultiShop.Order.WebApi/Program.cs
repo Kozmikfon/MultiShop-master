@@ -6,6 +6,7 @@ using MultiShop.Order.Application.Interfaces;
 using MultiShop.Order.Application.Services;
 using MultiShop.Order.Persistence.Context;
 using MultiShop.Order.Persistence.Repositories;
+using MultiShop.Order.WebApi.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,16 +48,20 @@ builder.Services.AddScoped<GetOrderDetailByVendorIdQueryHandler>();
 // 1. MASSTRANSIT VE RABBITMQ KAYDI (BURASI EKSÝK)
 builder.Services.AddMassTransit(x =>
 {
-    // Order tarafý genellikle sadece mesaj fýrlatýr (Publisher), 
-    // Bu yüzden burada Consumer eklememize gerek yok (o Cargo tarafýnda).
+    x.AddConsumer<OrderCompletedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        // AppSettings'teki URL'i kullanýyoruz
-        cfg.Host(builder.Configuration["RabbitMQUrl"] ?? "rabbitmq://localhost", h =>
+        // DÜZELTME: Sadece "localhost" yazýyoruz, protokolü MassTransit kendi ekler.
+        cfg.Host("localhost", "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
+        });
+
+        cfg.ReceiveEndpoint("order-completed-queue", e =>
+        {
+            e.ConfigureConsumer<OrderCompletedConsumer>(context);
         });
     });
 });

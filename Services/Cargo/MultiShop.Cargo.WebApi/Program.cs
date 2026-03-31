@@ -44,28 +44,28 @@ builder.Services.AddScoped<IShipinkSettings>(sp =>
 // 3. MASSTRANSIT & RABBITMQ AYARLARI
 builder.Services.AddMassTransit(x =>
 {
-    // 1. Consumer'ý MassTransit'e kaydediyoruz
+    x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<OrderPaidConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        // 2. RabbitMQ Baðlantý Ayarlarý
-        cfg.Host(builder.Configuration["RabbitMQUrl"] ?? "rabbitmq://localhost", h =>
+        // DÜZELTME: Buraya da sadece "localhost" yazýyoruz.
+        cfg.Host("localhost", "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
         });
 
-        // 3. Kuyruk ve Mesaj Eþleþtirmesi (Topology)
-        // Sabit üzerinden kuyruk adýný veriyoruz: "order-paid-queue"
-        cfg.ReceiveEndpoint(RabbitMQConstants.OrderPaidQueue, e =>
+        // 1. Kuyruk: Sipariþ Oluþtuðunda
+        cfg.ReceiveEndpoint("order-created-queue", e =>
         {
-            // Bu kuyruðu dinleyecek sýnýfý baðlýyoruz
-            e.ConfigureConsumer<OrderPaidConsumer>(context);
+            e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
 
-            // KRÝTÝK: IOrderPaidEvent tipindeki mesajlarý bu kuyruða yönlendiriyoruz.
-            // Bu sayede RabbitMQ üzerinde Exchange ve Queue baðlantýsý otomatik kurulur.
-            e.Bind<IOrderPaidEvent>();
+        // 2. Kuyruk: Ödeme Yapýldýðýnda
+        cfg.ReceiveEndpoint("order-paid-queue", e =>
+        {
+            e.ConfigureConsumer<OrderPaidConsumer>(context);
         });
     });
 });

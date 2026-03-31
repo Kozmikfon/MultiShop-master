@@ -1,8 +1,8 @@
 ﻿using MassTransit;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
-using MultiShop.Cargo.EntityLayer.Concrete;
 using MultiShop.Cargo.EntityLayer.Concrete.Enums;
+using MultiShop.Shared.Enums;
 using MultiShop.Shared.Events;
 
 namespace MultiShop.Cargo.WebApi.Consumers
@@ -11,62 +11,55 @@ namespace MultiShop.Cargo.WebApi.Consumers
     {
         private readonly IShipinkService _shipinkService;
         private readonly ICargoDetailDal _cargoDetaildal;
+        private readonly IPublishEndpoint _publishEndpoint; // 👈 Geri bildirim için eklendi
 
-        public OrderPaidConsumer(IShipinkService shipinkService, ICargoDetailDal cargoDetaildal)
+        public OrderPaidConsumer(
+            IShipinkService shipinkService,
+            ICargoDetailDal cargoDetaildal,
+            IPublishEndpoint publishEndpoint)
         {
             _shipinkService = shipinkService;
             _cargoDetaildal = cargoDetaildal;
+            _publishEndpoint = publishEndpoint;
         }
 
-        // DİKKAT: Buraya 'async' ekledik!
         public async Task Consume(ConsumeContext<IOrderPaidEvent> context)
         {
-            Console.WriteLine(">>>>>>>>> MESAJ CARGO SERVİSİNE ULAŞTI! <<<<<<<<<");
-            Console.WriteLine($"Sipariş ID: {context.Message.OrderingId}");
-            // 1. Gelen mesajı kargo nesnesine çevir (Mapping)
-            var cargoDetail = new CargoDetail
-            {
-                // Temel Bilgiler
-                OrderingId = context.Message.OrderingId,
-                VendorId = "3" ?? "VND-DEFAULT", // SQL Hatasını önler
-                SenderCustomer = "MultiShop Genel Depo",            // SQL Hatasını önler
-                Barcode = $"BRK-{context.Message.OrderingId}-{DateTime.Now.Ticks.ToString().Substring(12)}",
-
-                // Alıcı Bilgileri (Hata veren yerler buralardı)
-                ReceiverName = context.Message.ReceiverName,
-                ReceiverSurname = context.Message.ReceiverSurname,
-                ReceiverEmail = context.Message.ReceiverEmail ?? "musteri@mail.com",
-                ReceiverPhone = context.Message.ReceiverPhone ?? "05550000000",
-                ReceiverCity = context.Message.ReceiverCity ?? "Ankara",
-                ReceiverDistrict = context.Message.ReceiverDistrict ?? "Merkez",
-                ReceiverAddressDetail = context.Message.ReceiverAddressDetail ?? "Adres Bilgisi Yok",
-
-                // Boyut Bilgileri (Shipink'in istediği kısımlar)
-                Weight = 1.0,
-                Width = 15,
-                Height = 10,
-                Length = 20,
-
-                // Durum ve Şirket
-                CargoCompanyId = 1, // PTT vb.
-                CargoCustomerId = 1,
-                CurrentStatus = CargoStatus.Created
-            };
+            Console.WriteLine($">>>>> ÖDEME ONAYI GELDİ: Sipariş ID {context.Message.OrderingId} <<<<<");
 
             try
             {
-                // 2. Önce Kargo DB'sine kaydet
-                await _cargoDetaildal.Insert(cargoDetail);
-                Console.WriteLine($"✅ Adım 1: Kargo DB kaydı başarılı. ID: {cargoDetail.CargoDetailId}");
+                // 1. ADIM: Zaten oluşturulmuş olan kargo kaydını bul (OrderCreated'da açmıştık)
+                var existingCargo = await _cargoDetaildal.GetByFilterAsync(x => x.OrderingId == context.Message.OrderingId);
 
-                // 3. Shipink Sürecini Başlat (Daha önce yazdığımız o temiz Manager metodunu çağır)
-                var result = await _shipinkService.CreateShipmentAsync(cargoDetail.CargoDetailId);
-                Console.WriteLine($"🚀 Adım 2: Shipink Otomasyonu Tamamlandı: {result}");
+                if (existingCargo != null)
+                {
+                    // Kayıt varsa güncelle
+                    existingCargo.CurrentStatus = CargoStatus.Created;
+                    await _cargoDetaildal.Update(existingCargo);
+
+                    // 2. ADIM: Shipink Sürecini Başlat
+                    var result = await _shipinkService.CreateShipmentAsync(existingCargo.CargoDetailId);
+
+                    existingCargo.CurrentStatus = CargoStatus.LabelCreated;
+                    existingCargo.TrackingNumber=result.ToString();
+
+                    await _cargoDetaildal.Update(existingCargo);
+
+                    await _publishEndpoint.Publish<IOrderCompletedEvent>(new
+                    {
+                        OrderingId = context.Message.OrderingId,
+                        TrackingNumber = result.ToString(), // Shipink'ten dönen takip nosu
+                        Status = (int)OrderStatus.Shipped
+                    });
+
+                    Console.WriteLine($"✅ Adım 3: IOrderCompletedEvent fırlatıldı. Takip No: {result}");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Hata: Otomasyon zinciri kırıldı! {ex.Message}");
-                throw; // RabbitMQ mesajı hata kuyruğuna atsın
+                Console.WriteLine($"❌ Hata: Kargo süreci tamamlanamadı! {ex.Message}");
+                throw;
             }
         }
     }

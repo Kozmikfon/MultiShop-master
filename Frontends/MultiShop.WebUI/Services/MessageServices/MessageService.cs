@@ -24,11 +24,17 @@ namespace MultiShop.WebUI.Services.MessageServices
             return values;
         }
 
+        // MessageService.cs içindeki metodu böyle güncelle:
         public async Task<int> GetTotalMessageCountByReceiverId(string id)
         {
+            // Doğru URL: Controller/Action?Parametre
             var responseMessage = await _httpClient.GetAsync("UserMessage/GetTotalMessageCountByReceiverId?id=" + id);
-            var values = await responseMessage.Content.ReadFromJsonAsync<int>();
-            return values;
+
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                return await responseMessage.Content.ReadFromJsonAsync<int>();
+            }
+            return 0;
         }
     }
 }
