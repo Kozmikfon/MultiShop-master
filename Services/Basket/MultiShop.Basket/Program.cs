@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -19,6 +20,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     opt.Authority = builder.Configuration["IdentityServerUrl"];
     opt.Audience = "ResourceBasket";
     opt.RequireHttpsMetadata = false;
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    // RabbitMQ Yapýlandýrmasý
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        // RabbitMQUrl appsettings.json içinde "amqp://guest:guest@localhost:5672" þeklinde olmalý
+        cfg.Host(builder.Configuration["RabbitMQUrl"], "/", host =>
+        {
+            host.Username("guest");
+            host.Password("guest");
+        });
+    });
 });
 
 builder.Services.AddHttpContextAccessor();
