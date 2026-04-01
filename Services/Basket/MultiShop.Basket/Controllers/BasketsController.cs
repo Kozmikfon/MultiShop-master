@@ -44,5 +44,24 @@ namespace MultiShop.Basket.Controllers
             await _basketService.DeleteBasket(_loginService.GetUserId);
             return Ok("Sepet başarıyla silindi");
         }
+
+        [HttpPost("Checkout")]
+        public async Task<IActionResult> Checkout(BasketCheckoutDto basketCheckoutDto)
+        {
+            // 1. Giriş yapan kullanıcının ID'sini DTO'ya basıyoruz
+            basketCheckoutDto.UserId = _loginService.GetUserId;
+
+            // 2. Servis katmanındaki o meşhur zenginleştirilmiş süreci başlatıyoruz
+            var result = await _basketService.Checkout(basketCheckoutDto);
+
+            if (result)
+            {
+                return Ok("Sipariş talebi başarıyla alındı ve kuyruğa gönderildi.");
+            }
+
+            return BadRequest("Sipariş oluşturulurken bir hata oluştu. Sepetiniz boş olabilir.");
+        }
+
+
     }
 }

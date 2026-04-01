@@ -1,5 +1,8 @@
-﻿using MultiShop.Basket.Dtos;
+﻿using AutoMapper;
+using MassTransit;
+using MultiShop.Basket.Dtos;
 using MultiShop.Basket.Settings;
+using MultiShop.Shared.Events.Concrete;
 using System.Text.Json;
 
 namespace MultiShop.Basket.Services
@@ -9,12 +12,39 @@ namespace MultiShop.Basket.Services
         private readonly RedisService _redisService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-        public BasketService(RedisService redisService, IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
+        public BasketService(RedisService redisService, IHttpClientFactory httpClientFactory, IConfiguration configuration, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _redisService = redisService;
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
+
+        public async Task<bool> Checkout(BasketCheckoutDto basketCheckoutDto)
+        {
+            // 1. Sepeti Redis'ten çek
+            var basket = await GetBasket(basketCheckoutDto.UserId);
+            if (basket == null || basket.BasketItems.Count == 0) return false;
+
+            // 2. 🔥 AutoMapper Sihri 🔥
+            // Önce kullanıcı bilgilerini (adres, isim vb.) event'e mapliyoruz
+            var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(basketCheckoutDto);
+
+            // Sonra sepet bilgilerini (toplam fiyat, ağırlık) aynı nesnenin üzerine mapliyoruz
+            _mapper.Map(basket, checkoutEvent);
+
+            // 3. RabbitMQ'ya fırlat
+            await _publishEndpoint.Publish(checkoutEvent);
+
+            // 4. Sepeti temizle
+            await DeleteBasket(basketCheckoutDto.UserId);
+
+            return true;
+        }
+
         public async Task DeleteBasket(string userId)
         {
             await _redisService.GetDb().KeyDeleteAsync(userId);

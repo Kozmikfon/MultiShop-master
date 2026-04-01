@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using MultiShop.Basket.LoginServices;
+using MultiShop.Basket.Mapping;
 using MultiShop.Basket.Services;
 using MultiShop.Basket.Settings;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,7 +32,8 @@ builder.Services.AddSingleton<RedisService>(sp =>
     redis.Connect();
     return redis;
 });
-
+// AutoMapper kaydý (Tüm profilleri otomatik tarar)
+builder.Services.AddAutoMapper(typeof(GeneralMapping));
 builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add(new AuthorizeFilter(requireAuthorizePolicy));
