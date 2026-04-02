@@ -9,57 +9,38 @@ namespace MultiShop.Cargo.WebApi.Consumers
 {
     public class OrderPaidConsumer : IConsumer<IOrderPaidEvent>
     {
-        private readonly IShipinkService _shipinkService;
-        private readonly ICargoDetailDal _cargoDetaildal;
-        private readonly IPublishEndpoint _publishEndpoint; // 👈 Geri bildirim için eklendi
+        private readonly ICargoDetailService _cargoDetailService;
+        private readonly ICargoDetailDal _cargoDetailDal; // Sorgu için gerekebilir
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderPaidConsumer(
-            IShipinkService shipinkService,
-            ICargoDetailDal cargoDetaildal,
-            IPublishEndpoint publishEndpoint)
+        public OrderPaidConsumer(ICargoDetailService cargoDetailService, ICargoDetailDal cargoDetailDal, IPublishEndpoint publishEndpoint)
         {
-            _shipinkService = shipinkService;
-            _cargoDetaildal = cargoDetaildal;
+            _cargoDetailService = cargoDetailService;
+            _cargoDetailDal = cargoDetailDal;
             _publishEndpoint = publishEndpoint;
         }
 
         public async Task Consume(ConsumeContext<IOrderPaidEvent> context)
         {
-            Console.WriteLine($">>>>> ÖDEME ONAYI GELDİ: Sipariş ID {context.Message.OrderingId} <<<<<");
+            // 1. Önce kargo kaydını bul
+            var existingCargo = await _cargoDetailDal.GetByFilterAsync(x => x.OrderingId == context.Message.OrderingId);
 
-            try
+            if (existingCargo != null)
             {
-                // 1. ADIM: Zaten oluşturulmuş olan kargo kaydını bul (OrderCreated'da açmıştık)
-                var existingCargo = await _cargoDetaildal.GetByFilterAsync(x => x.OrderingId == context.Message.OrderingId);
+                // 🎯 Manager'daki profesyonel süreci başlat (API çağrısı + DB Update içeride yapılır)
+                var trackingNumber = await _cargoDetailService.TCreateShipmentProcessAsync(existingCargo.CargoDetailId);
 
-                if (existingCargo != null)
+                // 2. Sipariş servisine geri bildirimi gönder
+                await _publishEndpoint.Publish<IOrderCompletedEvent>(new
                 {
-                    // Kayıt varsa güncelle
-                    existingCargo.CurrentStatus = CargoStatus.Created;
-                    await _cargoDetaildal.Update(existingCargo);
-
-                    // 2. ADIM: Shipink Sürecini Başlat
-                    var result = await _shipinkService.CreateShipmentAsync(existingCargo.CargoDetailId);
-
-                    existingCargo.CurrentStatus = CargoStatus.LabelCreated;
-                    existingCargo.TrackingNumber=result.ToString();
-
-                    await _cargoDetaildal.Update(existingCargo);
-
-                    await _publishEndpoint.Publish<IOrderCompletedEvent>(new
-                    {
-                        OrderingId = context.Message.OrderingId,
-                        TrackingNumber = result.ToString(), // Shipink'ten dönen takip nosu
-                        Status = (int)OrderStatus.Shipped
-                    });
-
-                    Console.WriteLine($"✅ Adım 3: IOrderCompletedEvent fırlatıldı. Takip No: {result}");
-                }
+                    OrderingId = context.Message.OrderingId,
+                    TrackingNumber = trackingNumber,
+                    Status = (int)OrderStatus.Shipped
+                });
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"❌ Hata: Kargo süreci tamamlanamadı! {ex.Message}");
-                throw;
+                Console.WriteLine($">>>>> [HATA]: OrderingId {context.Message.OrderingId} için kargo kaydı bulunamadı! <<<<<");
             }
         }
     }

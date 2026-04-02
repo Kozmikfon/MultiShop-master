@@ -27,6 +27,8 @@ namespace MultiShop.Order.Application.Services
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            
+
             // 1. Ürün listesini Shipink formatına (items) çeviriyoruz
             var shipinkItems = command.OrderDetails.Select(x => new
             {

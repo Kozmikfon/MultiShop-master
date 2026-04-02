@@ -1,25 +1,26 @@
 ﻿using MassTransit;
-using MultiShop.Cargo.DataAccessLayer.Abstract;
-using MultiShop.Cargo.EntityLayer.Concrete;
-using MultiShop.Cargo.EntityLayer.Concrete.Enums;
-using MultiShop.Shared.Events;
+using MultiShop.Cargo.BusinessLayer.Abstract;
+using MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos;
+using MultiShop.Shared.Events.Abstract;
 
 namespace MultiShop.Cargo.WebApi.Consumers
 {
     public class OrderCreatedConsumer : IConsumer<IOrderCreatedEvent>
     {
-        private readonly ICargoDetailDal _cargoDetailDal;
+        // 🚀 DAL'ı değil, Service/Manager katmanını çağırıyoruz
+        private readonly ICargoDetailService _cargoDetailService;
 
-        public OrderCreatedConsumer(ICargoDetailDal cargoDetailDal)
+        public OrderCreatedConsumer(ICargoDetailService cargoDetailService)
         {
-            _cargoDetailDal = cargoDetailDal;
+            _cargoDetailService = cargoDetailService;
         }
 
         public async Task Consume(ConsumeContext<IOrderCreatedEvent> context)
         {
             var message = context.Message;
 
-            var cargoDetail = new CargoDetail
+            // 🎯 Consumer sadece DTO hazırlar (Veriyi paketler)
+            var createDto = new CreateCargoDetailDto
             {
                 OrderingId = message.OrderingId,
                 ReceiverName = message.ReceiverName,
@@ -30,25 +31,21 @@ namespace MultiShop.Cargo.WebApi.Consumers
                 ReceiverDistrict = message.ReceiverDistrict,
                 ReceiverAddressDetail = message.ReceiverAddressDetail,
                 ShipinkOrderId = message.ShipinkOrderId,
-
-                // Zorunlu olabilecek alanlara varsayılan değerler veriyoruz
-                SenderCustomer = message.SenderCustomer, // Veya message içinden gelmeli
-                CargoCompanyId = message.CargoCompanyId, // Veritabanındaki geçerli bir ID olmalı
-                CargoCustomerId = message.CargoCustomerId, // Veritabanındaki geçerli bir ID olmalı
+                SenderCustomer = message.SenderCustomer,
+                CargoCompanyId = message.CargoCompanyId,
+                CargoCustomerId = message.CargoCustomerId,
                 VendorId = message.VendorId,
-
-                CurrentStatus = CargoStatus.Created,
-                Barcode = $"BRK-{message.OrderingId}-{Guid.NewGuid().ToString().Substring(0, 5).ToUpper()}",
-
-                // Boyutlar için varsayılan değer
                 Weight = message.Weight,
-                Width = message.Width ,
-                Height = message.Height ,
-                Length = message.Length ,
+                Width = message.Width,
+                Height = message.Height,
+                Length = message.Length
+                // ❌ Barkod ve Statü burada atanmaz! Manager halledecek.
             };
 
-            await _cargoDetailDal.Insert(cargoDetail);
-            Console.WriteLine($">>>>> CARGO: Sipariş {message.OrderingId} için ilk kayıt (Pending) açıldı. <<<<<");
+            // 🚀 TETİKLE: Tüm iş mantığı artık Manager'ın omuzlarında.
+            await _cargoDetailService.TInsertAsync(createDto);
+
+            Console.WriteLine($">>>>> [CONSUMER]: Sipariş {message.OrderingId} için Manager tetiklendi. <<<<<");
         }
     }
 }

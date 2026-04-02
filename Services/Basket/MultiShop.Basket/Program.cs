@@ -28,7 +28,7 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         // RabbitMQUrl appsettings.json içinde "amqp://guest:guest@localhost:5672" þeklinde olmalý
-        cfg.Host(builder.Configuration["RabbitMQUrl"], "/", host =>
+        cfg.Host("localhost", "/", host =>
         {
             host.Username("guest");
             host.Password("guest");
@@ -51,6 +51,7 @@ builder.Services.AddSingleton<RedisService>(sp =>
 builder.Services.AddAutoMapper(typeof(GeneralMapping));
 builder.Services.AddControllers(opt =>
 {
+    // ?? Ýþte burasý! Bu satýr projendeki TÜM Controller'lara otomatik [Authorize] basar.
     opt.Filters.Add(new AuthorizeFilter(requireAuthorizePolicy));
 });
 

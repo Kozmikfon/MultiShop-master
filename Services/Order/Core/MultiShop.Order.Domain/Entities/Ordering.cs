@@ -13,6 +13,7 @@ namespace MultiShop.Order.Domain.Entities
         public int OrderingId { get; set; }
         public string UserId { get; set; }
         public decimal TotalPrice { get; set; }
+        public double TotalWeight { get; set; }
         public DateTime OrderDate { get; set; }
         public int AddressId { get; set; }
         public string ShipinkOrderId { get; set; }

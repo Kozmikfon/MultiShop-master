@@ -8,9 +8,10 @@ using System.Security.Claims;
 
 namespace MultiShop.Basket.Controllers
 {
+    
     //[Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/[controller]")]     
+    [ApiController] 
     public class BasketsController : ControllerBase
     {
         private readonly IBasketService _basketService;
@@ -21,7 +22,7 @@ namespace MultiShop.Basket.Controllers
             _basketService = basketService;
             _loginService = loginService;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetMyBasketDetail()
         {

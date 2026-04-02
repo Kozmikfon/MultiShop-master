@@ -13,21 +13,19 @@ namespace MultiShop.Cargo.DataAccessLayer.EntityFramework
 {
     public class EfCargoDetailDal : GenericRepository<CargoDetail>, ICargoDetailDal
     {
-        private readonly CargoContext _cargoContext;
 
-        public EfCargoDetailDal(CargoContext context,CargoContext cargoContext) : base(context)
-        {
-            _cargoContext = cargoContext;
+        public EfCargoDetailDal(CargoContext context) : base(context)
+        { 
         }
 
         public async Task<List<CargoDetail>> GetCargoDetailsByVendorId(string vendorId)
         {
-            return await _cargoContext.CargoDetails.Where(x=>x.VendorId== vendorId).ToListAsync();
+            return await _context.CargoDetails.Where(x=>x.VendorId== vendorId).ToListAsync();
         }
 
         public async Task<CargoDetail> GetCargoDetailWithCompany(int cargoDetailId)
         {
-            return await _cargoContext.CargoDetails
+            return await _context.CargoDetails
              .Include(x => x.CargoCompany) // Kritik nokta: Company nesnesi null gelmesin diye
              .FirstOrDefaultAsync(x => x.CargoDetailId == cargoDetailId);
         }

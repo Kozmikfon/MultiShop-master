@@ -17,5 +17,10 @@ namespace MultiShop.Order.Domain.Entities
         public int OrderingId { get; set; }
         public string VendorId { get; set; }
         public Ordering Ordering { get; set; }
+        public double Weight { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Length { get; set; }
+
     }
 }

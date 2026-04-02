@@ -16,7 +16,7 @@ namespace MultiShop.Shared.Events
         string ReceiverCity { get; }
         string ReceiverDistrict { get; }
         string ReceiverAddressDetail { get; }
-        // Shipink için lazım olacak kargo firması ID'si
+        
         int CargoCompanyId { get; }
         int CargoCustomerId { get; }
 

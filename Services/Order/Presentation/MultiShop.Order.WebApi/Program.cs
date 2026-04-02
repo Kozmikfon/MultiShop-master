@@ -48,6 +48,7 @@ builder.Services.AddScoped<GetOrderDetailByVendorIdQueryHandler>();
 // 1. MASSTRANSIT VE RABBITMQ KAYDI (BURASI EKSÝK)
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<BasketCheckoutConsumer>();
     x.AddConsumer<OrderCompletedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
@@ -59,6 +60,10 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
 
+        cfg.ReceiveEndpoint("basket-checkout-queue", e =>
+        {
+            e.ConfigureConsumer<BasketCheckoutConsumer>(context);
+        });
         cfg.ReceiveEndpoint("order-completed-queue", e =>
         {
             e.ConfigureConsumer<OrderCompletedConsumer>(context);

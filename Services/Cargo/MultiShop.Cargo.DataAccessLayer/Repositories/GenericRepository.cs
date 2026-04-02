@@ -12,7 +12,7 @@ namespace MultiShop.Cargo.DataAccessLayer.Repositories
 {
     public class GenericRepository<T> : IGenericDal<T> where T : class
     {
-        private readonly CargoContext _context;
+        protected readonly CargoContext _context;
         public GenericRepository(CargoContext context)
         {
             _context = context;
@@ -20,9 +20,13 @@ namespace MultiShop.Cargo.DataAccessLayer.Repositories
         public async Task Delete(int id)
         {
             var values = await _context.Set<T>().FindAsync(id);
-            _context.Set<T>().Remove(values);
-            _context.SaveChanges();
+            if (values != null)
+            {
+                _context.Set<T>().Remove(values);
+                await _context.SaveChangesAsync();
+            }
         }
+
         public async Task<List<T>> GetAll()
         {
             var values = await _context.Set<T>().ToListAsync();

@@ -25,21 +25,22 @@ namespace MultiShop.Basket.Services
 
         public async Task<bool> Checkout(BasketCheckoutDto basketCheckoutDto)
         {
-            // 1. Sepeti Redis'ten çek
+            // Redis'ten en güncel sepeti çek (Sum işlemleri burada Get içinde yapılacak)
             var basket = await GetBasket(basketCheckoutDto.UserId);
+
             if (basket == null || basket.BasketItems.Count == 0) return false;
 
-            // 2. 🔥 AutoMapper Sihri 🔥
-            // Önce kullanıcı bilgilerini (adres, isim vb.) event'e mapliyoruz
+            // 4. ADIM: AutoMapper Mapping
             var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(basketCheckoutDto);
 
-            // Sonra sepet bilgilerini (toplam fiyat, ağırlık) aynı nesnenin üzerine mapliyoruz
+            // Sepetteki TotalPrice ve TotalWeight değerlerini Event nesnesine aktar
             _mapper.Map(basket, checkoutEvent);
 
-            // 3. RabbitMQ'ya fırlat
+            // RabbitMQ'ya gönderilen mesajı terminalde loglayalım (Test için çok önemli)
+            Console.WriteLine($">>>>> [CHECKOUT]: {checkoutEvent.UserId} için {checkoutEvent.TotalPrice} TL ve {checkoutEvent.TotalWeight} kg sipariş geçiliyor... <<<<<");
+
             await _publishEndpoint.Publish(checkoutEvent);
 
-            // 4. Sepeti temizle
             await DeleteBasket(basketCheckoutDto.UserId);
 
             return true;
@@ -58,45 +59,59 @@ namespace MultiShop.Basket.Services
                 return new BasketTotalDto { UserId = userId, BasketItems = new List<BasketItemDto>() };
             }
 
-            return JsonSerializer.Deserialize<BasketTotalDto>(existBasket);
+            // 2. ADIM: JSON okurken harf duyarlılığını kapatıyoruz
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            return JsonSerializer.Deserialize<BasketTotalDto>(existBasket, options);
         }
         public async Task SaveBasket(BasketTotalDto basketTotalDto)
         {
             var client = _httpClientFactory.CreateClient();
-            // Appsettings.json içinde "CatalogApiUrl" tanımlı olmalı. Örn: http://localhost:7070/api
             var catalogApiUrl = _configuration["CatalogApiUrl"];
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            // 🚀 KRİTİK NOKTA: Sepetteki her ürünü kargo verileriyle dolduruyoruz
-            foreach (var item in basketTotalDto.BasketItems)
+            // 🚀 ADIM A: Önce mevcut sepeti Redis'ten çekiyoruz
+            var currentBasket = await GetBasket(basketTotalDto.UserId);
+
+            foreach (var incomingItem in basketTotalDto.BasketItems)
             {
-                try
+                // 🚀 ADIM B: Gelen ürün zaten sepette var mı?
+                var existingItem = currentBasket.BasketItems.FirstOrDefault(x => x.ProductId == incomingItem.ProductId);
+
+                if (existingItem != null)
                 {
-                    // Catalog API'den ürünün fiziksel özelliklerini çekiyoruz
-                    var response = await client.GetAsync($"{catalogApiUrl}/products/{item.ProductId}");
-
-                    if (response.IsSuccessStatusCode)
+                    // Varsa: Sadece miktarını artırıyoruz
+                    existingItem.Quantity += incomingItem.Quantity;
+                }
+                else
+                {
+                    // Yoksa: Önce Katalog'dan fiziksel verilerini çekiyoruz
+                    try
                     {
-                        var productDetail = await response.Content.ReadFromJsonAsync<CatalogProductDto>();
-
-                        if (productDetail != null)
+                        var response = await client.GetAsync($"{catalogApiUrl}/products/{incomingItem.ProductId}");
+                        if (response.IsSuccessStatusCode)
                         {
-                            item.Weight = productDetail.Weight;
-                            item.Width = productDetail.Width;
-                            item.Height = productDetail.Height;
-                            item.Length = productDetail.Length;
+                            var productDetail = await response.Content.ReadFromJsonAsync<CatalogProductDto>(options);
+                            if (productDetail != null)
+                            {
+                                if (productDetail.Weight > 0) incomingItem.Weight = productDetail.Weight;
+                                if (productDetail.Width > 0) incomingItem.Width = productDetail.Width;
+                                if (productDetail.Height > 0) incomingItem.Height = productDetail.Height;
+                                if (productDetail.Length > 0) incomingItem.Length = productDetail.Length;
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    // Catalog kapalıysa veya hata verirse sipariş aksamasın diye varsayılan değer atıyoruz
-                    Console.WriteLine($"Catalog API Hatası: {ex.Message}");
-                    item.Weight = 1.0;
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($">>>>> Catalog API Hatası: {ex.Message} <<<<<");
+                    }
+
+                    // Yeni ürünü listeye ekle
+                    currentBasket.BasketItems.Add(incomingItem);
                 }
             }
 
-            // Artık kargo bilgileri dolu olan sepeti Redis'e yazıyoruz
-            await _redisService.GetDb().StringSetAsync(basketTotalDto.UserId, JsonSerializer.Serialize(basketTotalDto));
+            // 🚀 ADIM C: Birleşmiş ve güncellenmiş sepeti Redis'e yazıyoruz
+            await _redisService.GetDb().StringSetAsync(currentBasket.UserId, JsonSerializer.Serialize(currentBasket));
         }
 
     }

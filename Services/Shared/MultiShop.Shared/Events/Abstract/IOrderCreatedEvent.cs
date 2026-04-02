@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiShop.Shared.Events
+namespace MultiShop.Shared.Events.Abstract
 {
     public interface IOrderCreatedEvent
     {
@@ -24,6 +24,7 @@ namespace MultiShop.Shared.Events
         int CargoCustomerId { get; }
         string VendorId { get; }
         string SenderCustomer { get; }
+
         double Weight { get; }      // Bunu ekle
         int Width { get; }         // Bunu ekle
         int Height { get; }        // Bunu ekle
