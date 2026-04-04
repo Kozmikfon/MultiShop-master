@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\MultiShop.Shared\MultiShop.Shared.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.DataAccessLayer\MultiShop.Cargo.DataAccessLayer.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.DtoLayer\MultiShop.Cargo.DtoLayer.csproj" />
     <ProjectReference Include="..\MultiShop.Cargo.EntityLayer\MultiShop.Cargo.EntityLayer.csproj" />
@@ -20,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="10.0.3" />
   </ItemGroup>

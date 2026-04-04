@@ -11,8 +11,6 @@ namespace MultiShop.Shared.Events.Abstract
         int OrderingId { get; }
         string UserId { get; }
         decimal TotalPrice { get; }
-
-        // Kargo kaydı için gereken adres bilgileri
         string ReceiverName { get; }
         string ReceiverSurname { get; }
         string ReceiverEmail { get; }
@@ -20,17 +18,14 @@ namespace MultiShop.Shared.Events.Abstract
         string ReceiverCity { get; }
         string ReceiverDistrict { get; }
         string ReceiverAddressDetail { get; }
-        int CargoCompanyId { get; } // Bunu ekle
+        int CargoCompanyId { get; } 
         int CargoCustomerId { get; }
         string VendorId { get; }
         string SenderCustomer { get; }
-
-        double Weight { get; }      // Bunu ekle
-        int Width { get; }         // Bunu ekle
-        int Height { get; }        // Bunu ekle
-        int Length { get; }        // Bunu ekle
-
-        // Shipink tarafında önceden oluşmuş olan ID
+        double Weight { get; }      
+        int Width { get; }        
+        int Height { get; }        
+        int Length { get; }        
         string ShipinkOrderId { get; }
     }
 }

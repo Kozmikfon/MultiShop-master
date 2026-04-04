@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using MassTransit;
 using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.DtoLayer.Dtos.CargoDetailDtos;
 using MultiShop.Cargo.EntityLayer.Concrete;
 using MultiShop.Cargo.EntityLayer.Concrete.Enums;
+using MultiShop.Shared.Events.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +20,14 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
         private readonly ICargoDetailDal _cargoDetailDal;
         private readonly IShipinkService _shipinkService;
         private readonly IMapper _mapper;
-        public CargoDetailManager(ICargoDetailDal cargoDetailDal, IMapper mapper, ICargoOperationDal cargoOperationDal, IShipinkService shipinkService)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public CargoDetailManager(ICargoDetailDal cargoDetailDal, IMapper mapper, ICargoOperationDal cargoOperationDal, IShipinkService shipinkService, IPublishEndpoint publishEndpoint = null)
         {
             _cargoDetailDal = cargoDetailDal;
             _mapper = mapper;
             _cargoOperationDal = cargoOperationDal;
             _shipinkService = shipinkService;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<ResultCargoDetailDto> TChangeCargoStatus(int cargoDetailId, CargoStatus newStatus)
@@ -89,12 +93,12 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
 
             Console.WriteLine($">>>>> YENİ KARGO ID: {value.CargoDetailId}");
 
-            // 2. Kayıt başarılıysa Shipink'e ilk bildirimi yapıyoruz
+            // 2. Kayıt başarılıysa Shipink'e bildirimi yapıyoruz
             try
             {
                 var trackingNumber = await _shipinkService.CreateShipmentAsync(value.CargoDetailId);
 
-                // 3. Eğer Shipink bir numara döndüyse, kargoyu bu numarayla güncelliyoruz
+                // 3. Eğer Shipink bir numara döndüyse
                 if (!string.IsNullOrEmpty(trackingNumber))
                 {
                     value.TrackingNumber = trackingNumber;
@@ -102,11 +106,20 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
 
                     await _cargoDetailDal.Update(value);
                     Console.WriteLine("✅ SHIPINK TAKİP NO ALINDI: " + trackingNumber);
+
+                    // 🔥 İŞTE O AN: Order Servisine "Takip Numarası Oluştu" haberini uçuruyoruz!
+                    // Anonim nesne kullanarak Interface üzerinden fırlatıyoruz (Loose Coupling).
+                    await _publishEndpoint.Publish<IOrderTrackingNumberCreatedEvent>(new
+                    {
+                        OrderingId = value.OrderingId,
+                        TrackingNumber = trackingNumber
+                    });
+
+                    Console.WriteLine($">>>>> [EVENT]: Sipariş {value.OrderingId} için takip no Order servisine yayınlandı. <<<<<");
                 }
             }
             catch (Exception ex)
             {
-                // API hatası olsa bile kargo veritabanımızda kalır, numara boş kalır.
                 Console.WriteLine($">>>>> SHIPINK API HATASI: {ex.Message}");
             }
         }

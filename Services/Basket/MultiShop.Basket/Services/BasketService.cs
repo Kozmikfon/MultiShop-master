@@ -30,11 +30,11 @@ namespace MultiShop.Basket.Services
 
             if (basket == null || basket.BasketItems.Count == 0) return false;
 
-            // 4. ADIM: AutoMapper Mapping
-            var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(basketCheckoutDto);
+            
+            var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(basket);
 
-            // Sepetteki TotalPrice ve TotalWeight değerlerini Event nesnesine aktar
-            _mapper.Map(basket, checkoutEvent);
+
+            _mapper.Map(basketCheckoutDto, checkoutEvent);
 
             // RabbitMQ'ya gönderilen mesajı terminalde loglayalım (Test için çok önemli)
             Console.WriteLine($">>>>> [CHECKOUT]: {checkoutEvent.UserId} için {checkoutEvent.TotalPrice} TL ve {checkoutEvent.TotalWeight} kg sipariş geçiliyor... <<<<<");

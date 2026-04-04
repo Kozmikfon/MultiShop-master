@@ -50,6 +50,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<BasketCheckoutConsumer>();
     x.AddConsumer<OrderCompletedConsumer>();
+    x.AddConsumer<OrderTrackingNumberConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -64,10 +65,20 @@ builder.Services.AddMassTransit(x =>
         {
             e.ConfigureConsumer<BasketCheckoutConsumer>(context);
         });
+
         cfg.ReceiveEndpoint("order-completed-queue", e =>
         {
             e.ConfigureConsumer<OrderCompletedConsumer>(context);
+
         });
+
+
+        cfg.ReceiveEndpoint("order-tracking-queue", e =>
+        {
+            e.ConfigureConsumer<OrderTrackingNumberConsumer>(context);
+            e.PublishFaults = true;
+        });
+
     });
 });
 

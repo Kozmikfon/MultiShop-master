@@ -9,6 +9,7 @@ namespace MultiShop.Cargo.WebApi.Consumers
     {
         // 🚀 DAL'ı değil, Service/Manager katmanını çağırıyoruz
         private readonly ICargoDetailService _cargoDetailService;
+        
 
         public OrderCreatedConsumer(ICargoDetailService cargoDetailService)
         {
@@ -31,7 +32,7 @@ namespace MultiShop.Cargo.WebApi.Consumers
                 ReceiverDistrict = message.ReceiverDistrict,
                 ReceiverAddressDetail = message.ReceiverAddressDetail,
                 ShipinkOrderId = message.ShipinkOrderId,
-                SenderCustomer = message.SenderCustomer,
+                SenderCustomer = message.SenderCustomer ?? "MultiShop Satıcısı",
                 CargoCompanyId = message.CargoCompanyId,
                 CargoCustomerId = message.CargoCustomerId,
                 VendorId = message.VendorId,
@@ -42,8 +43,9 @@ namespace MultiShop.Cargo.WebApi.Consumers
                 // ❌ Barkod ve Statü burada atanmaz! Manager halledecek.
             };
 
+
             // 🚀 TETİKLE: Tüm iş mantığı artık Manager'ın omuzlarında.
-            await _cargoDetailService.TInsertAsync(createDto);
+            await _cargoDetailService.TInsertAsync(createDto); 
 
             Console.WriteLine($">>>>> [CONSUMER]: Sipariş {message.OrderingId} için Manager tetiklendi. <<<<<");
         }

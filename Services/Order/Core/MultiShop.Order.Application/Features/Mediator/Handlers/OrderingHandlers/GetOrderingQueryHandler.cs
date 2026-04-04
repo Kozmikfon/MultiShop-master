@@ -29,7 +29,12 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
                 OrderDate = x.OrderDate,
                 TotalPrice = x.TotalPrice,
                 UserId = x.UserId,
-                AddressId = x.AddressId
+                AddressId = x.AddressId,
+                OrderStatus=x.OrderStatus,
+                PaymentStatus=x.PaymentStatus,
+                ShipinkOrderId=x.ShipinkOrderId,
+                TotalWeight = x.TotalWeight,
+                TrackingNumber = x.TrackingNumber
             }).ToList();
         }
     }

@@ -2,6 +2,7 @@
 using MediatR;
 using MultiShop.Order.Application.Features.CQRS.Commands.OrderDetailCommands;
 using MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands;
+using MultiShop.Shared.Events.Abstract;
 using MultiShop.Shared.Events.Concrete;
 
 namespace MultiShop.Order.WebApi.Consumers
@@ -19,37 +20,45 @@ namespace MultiShop.Order.WebApi.Consumers
         {
             var basketData = context.Message;
 
-            var orderDetails = basketData.BasketItems.Select(x => new CreateOrderDetailCommand
+            // 🚀 TRENDYOL MANTIĞI: Satıcıya göre paketleri ayır
+            var packages = basketData.BasketItems.GroupBy(x => x.VendorId);
+
+            foreach (var package in packages)
             {
-                ProductId = x.ProductId,
-                ProductName = x.ProductName,
-                ProductPrice = x.Price,
-                ProductAmount = x.Quantity,
-                ProductTotalPrice = x.Price * x.Quantity,
-                VendorId = x.VendorId // Eğer basket'te varsa aktar
-            }).ToList();
+                var vendorId = package.Key; // Satıcı (Örn: Apple Store)
+                var itemsInPackage = package.ToList(); // O satıcının ürünleri
 
+                // Her paket için ayrı bir "CreateOrderingCommand" fırlatıyoruz
+                await _mediator.Send(new CreateOrderingCommand
+                {
+                    UserId = basketData.UserId,
+                    VendorId = vendorId, // 🎯 KRİTİK: Her paket kendi satıcısını bilir!
 
-            // 🎯 SADECE TETİKLE: Tüm iş mantığını uzmanına (Handler) devrediyoruz.
-            await _mediator.Send(new CreateOrderingCommand
-            {
-                UserId = basketData.UserId,
-                TotalPrice = basketData.TotalPrice,
-                AddressId = int.TryParse(basketData.AddressId, out int id) ? id : 0,
+                    // Sadece bu paketteki ürünlerin fiyat toplamı
+                    TotalPrice = itemsInPackage.Sum(x => x.Price * x.Quantity),
+                    SenderCustomer=$"MultiShop-{vendorId}", 
+                    // Sadece bu paketteki ürünlerin fiziksel verileri (Kargo için)
+                    Weight = itemsInPackage.Sum(x => x.Weight),
+                    Width = itemsInPackage.Max(x => x.Width),
+                    Height = itemsInPackage.Max(x => x.Height),
+                    Length = itemsInPackage.Max(x => x.Length),
+                    CargoCustomerId= 1,
+                    
 
-                OrderDetails=orderDetails,
-                // Fiziksel veriler sepetten Handler'a akıyor
-                Weight = basketData.TotalWeight,
-                Width = basketData.BasketItems.Any() ? basketData.BasketItems.Max(x => x.Width) : 0,
-                Height = basketData.BasketItems.Any() ? basketData.BasketItems.Max(x => x.Height) : 0,
-                Length = basketData.BasketItems.Any() ? basketData.BasketItems.Max(x => x.Length) : 0,
+                    OrderDetails = itemsInPackage.Select(x => new CreateOrderDetailCommand
+                    {
+                        ProductId = x.ProductId,
+                        ProductName = x.ProductName,
+                        ProductPrice = x.Price,
+                        ProductAmount = x.Quantity,
+                        VendorId = x.VendorId,
+                        
+                    }).ToList(),
 
-                // Akıllı atama: Varsayılan kargo şirket ID'si
-                CargoCompanyId = 3005,
-                SenderCustomer = "MultiShop Ana Depo"
-            });
-
-            Console.WriteLine($">>>>> [CONSUMER]: BasketCheckoutEvent alındı ve Handler tetiklendi. <<<<<");
+                    AddressId = int.TryParse(basketData.AddressId, out int id) ? id : 0,
+                    CargoCompanyId = 3005 // PTT
+                });
+            }
         }
     }
 }

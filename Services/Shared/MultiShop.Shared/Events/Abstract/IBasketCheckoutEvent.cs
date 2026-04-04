@@ -10,10 +10,10 @@ namespace MultiShop.Shared.Events.Abstract
     public interface IBasketCheckoutEvent
     {
         public string UserId { get; set; }
-        public string CustomerName { get; set; } // Ödeme anında alınacak
-        public string CustomerSurname { get; set; }
-        public string CustomerEmail { get; set; }
-        public string CustomerPhone { get; set; }
+        public string Name { get; set; } // Ödeme anında alınacak
+        public string Surname { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
         public string AddressId { get; set; }
         public decimal TotalPrice { get; set; }
         public double TotalWeight { get; set; } // 🚀 İşte o meşhur hesapladığımız ağırlık!
