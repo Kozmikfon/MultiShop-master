@@ -7,6 +7,7 @@ using MultiShop.Order.Application.Services;
 using MultiShop.Order.Persistence.Context;
 using MultiShop.Order.Persistence.Repositories;
 using MultiShop.Order.WebApi.Consumers;
+using MultiShop.Shared.Events.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,16 +73,18 @@ builder.Services.AddMassTransit(x =>
 
         });
 
-
         cfg.ReceiveEndpoint("order-tracking-queue", e =>
         {
             e.ConfigureConsumer<OrderTrackingNumberConsumer>(context);
-            e.PublishFaults = true;
+
+
+
         });
 
     });
 });
 
+builder.Services.AddMassTransitHostedService();
 // 2. MediatR veya Application Service kayýtlarýnýn altýnda durabilir
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

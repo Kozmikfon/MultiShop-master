@@ -2,19 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MultiShop.Cargo.DtoLayer.Dtos.ShipinkDtos
 {
     public class ShipinkShipmentRequestDto
     {
+        [JsonPropertyName("direction")]
         public string direction { get; set; } = "outgoing";
-        public string order_id { get; set; } // Örn: "912e71c6...:18"
-        public string carrier_service_id { get; set; } // "ptt_standart"
+
+        [JsonPropertyName("order_id")]
+        public string order_id { get; set; }
+
+        [JsonPropertyName("carrier_service_id")]
+        public string carrier_service_id { get; set; }
+
+        [JsonPropertyName("carrier_account_id")]
         public string carrier_account_id { get; set; }
+
+        [JsonPropertyName("warehouse_id")]
         public string warehouse_id { get; set; }
-        public string card_id { get; set; } // Kritik: "5d0e3a74..."
+
+        [JsonPropertyName("card_id")]
+        public string card_id { get; set; }
+
+        [JsonPropertyName("sales_invoice")]
+        public SalesInvoice sales_invoice { get; set; }
+
+        [JsonPropertyName("packages")]
         public List<ShipinkPackageDto> packages { get; set; }
-        public bool create_invoice { get; set; } = false;
+
+        [JsonPropertyName("create_invoice")]
+        public bool create_invoice { get; set; }
     }
 }

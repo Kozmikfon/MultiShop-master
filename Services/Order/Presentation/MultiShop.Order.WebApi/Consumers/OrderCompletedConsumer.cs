@@ -2,9 +2,9 @@
 using MultiShop.Order.Application.Interfaces;
 using MultiShop.Order.Domain.Entities;
 using MultiShop.Shared.Enums;
-using MultiShop.Shared.Events;
+using MultiShop.Shared.Events.Abstract;
 
-    namespace MultiShop.Order.WebApi.Consumers
+namespace MultiShop.Order.WebApi.Consumers
     {
         public class OrderCompletedConsumer : IConsumer<IOrderCompletedEvent>
         {

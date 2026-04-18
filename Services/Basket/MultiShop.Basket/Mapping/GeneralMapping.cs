@@ -10,8 +10,17 @@ namespace MultiShop.Basket.Mapping
         public GeneralMapping()
         {
             CreateMap<BasketItemDto, BasketItemEvent>().ReverseMap();
-            CreateMap<BasketCheckoutDto, BasketCheckoutEvent>().ReverseMap();
-            CreateMap<BasketTotalDto, BasketCheckoutEvent>().ReverseMap();
+
+            // 🎯 DTO'dan Event'e geçerken SADECE kişisel bilgileri alalım (Fiyat/Ağırlık ezilmesin)
+            CreateMap<BasketCheckoutDto, BasketCheckoutEvent>()
+                .ForMember(dest => dest.TotalPrice, opt => opt.Ignore())   // DTO'daki boş fiyat event'i bozmasın
+                .ForMember(dest => dest.TotalWeight, opt => opt.Ignore())  // DTO'daki boş ağırlık event'i bozmasın
+                .ReverseMap();
+
+            // 🎯 Toplam Sepetten Event'e (Ürünler, Fiyat ve Ağırlık buradan gelir)
+            CreateMap<BasketTotalDto, BasketCheckoutEvent>()
+                .ForMember(dest => dest.BasketItems, opt => opt.MapFrom(src => src.BasketItems))
+                .ReverseMap();
 
 
         }

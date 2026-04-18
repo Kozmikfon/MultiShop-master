@@ -23,6 +23,10 @@ using System;
             public int Width { get; set; }
             public int Height { get; set; }
             public int Length { get; set; }
+            public string ReceiverName { get; set; }
+            public string ReceiverSurname { get; set; }
+            public string ReceiverEmail { get; set; }
+            public string ReceiverPhone { get; set; }
 
             public string VendorId { get; set; }
             public List<CreateOrderDetailCommand> OrderDetails { get; set; }

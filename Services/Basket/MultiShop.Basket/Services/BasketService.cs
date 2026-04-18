@@ -25,24 +25,19 @@ namespace MultiShop.Basket.Services
 
         public async Task<bool> Checkout(BasketCheckoutDto basketCheckoutDto)
         {
-            // Redis'ten en güncel sepeti çek (Sum işlemleri burada Get içinde yapılacak)
             var basket = await GetBasket(basketCheckoutDto.UserId);
-
-            if (basket == null || basket.BasketItems.Count == 0) return false;
-
+            if (basket == null || basket.BasketItems.Count == 0) return false;  
             
             var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(basket);
 
-
+            
             _mapper.Map(basketCheckoutDto, checkoutEvent);
 
-            // RabbitMQ'ya gönderilen mesajı terminalde loglayalım (Test için çok önemli)
-            Console.WriteLine($">>>>> [CHECKOUT]: {checkoutEvent.UserId} için {checkoutEvent.TotalPrice} TL ve {checkoutEvent.TotalWeight} kg sipariş geçiliyor... <<<<<");
+            
+            Console.WriteLine($">>>>> [CHECKOUT]: {checkoutEvent.Name} {checkoutEvent.Surname} | Ağırlık: {checkoutEvent.TotalWeight} kg | Fiyat: {checkoutEvent.TotalPrice} TL <<<<<");
 
             await _publishEndpoint.Publish(checkoutEvent);
-
             await DeleteBasket(basketCheckoutDto.UserId);
-
             return true;
         }
 

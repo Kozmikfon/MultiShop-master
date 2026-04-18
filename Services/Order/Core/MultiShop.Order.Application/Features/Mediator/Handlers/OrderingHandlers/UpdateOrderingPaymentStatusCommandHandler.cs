@@ -5,7 +5,7 @@ using MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands;
 using MultiShop.Order.Application.Interfaces;
 using MultiShop.Order.Domain.Entities;
 using MultiShop.Order.Domain.Entities.Enums; // Enum için
-using MultiShop.Shared.Events; // Ortak kütüphanen
+using MultiShop.Shared.Events.Abstract; // Ortak kütüphanen
 
 namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandlers
 {

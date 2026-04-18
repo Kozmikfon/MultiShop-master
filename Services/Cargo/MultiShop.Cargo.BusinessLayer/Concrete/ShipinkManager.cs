@@ -8,6 +8,7 @@ using MultiShop.Cargo.EntityLayer.Concrete.Enums;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MultiShop.Cargo.BusinessLayer.Concrete
 {
@@ -28,7 +29,6 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
 
         public async Task<string> CreateShipmentAsync(int cargoDetailId)
         {
-            // 1. DİNAMİK VERİ: Include ile firmayı çekiyoruz (GetCargoDetailWithCompany DAL'da yazılmalı)
             var cargo = await _cargoDetailDal.GetCargoDetailWithCompany(cargoDetailId);
             if (cargo == null) return "Kargo kaydı bulunamadı.";
 
@@ -36,50 +36,69 @@ namespace MultiShop.Cargo.BusinessLayer.Concrete
             var token = await GetAccessTokenAsync();
             if (string.IsNullOrEmpty(token)) return "Yetkilendirme hatası.";
 
+            // Header'ları temizleyelim ve baştan kuralım
+            client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); // KRİTİK
+            client.DefaultRequestHeaders.Add("X-Language", "TR");
 
-            // 2. TEMİZ VE DİNAMİK PAYLOAD: Postman'da çalışan en sade yapı
-            // 2. TEMİZ VE DİNAMİK PAYLOAD: JSON formatına tam uyum sağlayan hali
             var shipmentRequest = new ShipinkShipmentRequestDto
             {
-                direction = "outgoing", // 👈 Eksik olan kritik alan
-                order_id = cargo.ShipinkOrderId, // 👈 Shipink'teki Sipariş ID'si (Guid olan)
+                direction = "outgoing",
+                order_id = cargo.ShipinkOrderId, // GUID + :ID formatı
                 carrier_account_id = cargo.CargoCompany.CarrierAccountId,
                 carrier_service_id = cargo.CargoCompany.CarrierServiceId,
                 warehouse_id = _settings.WarehouseId,
                 card_id = _settings.CardId,
-                create_invoice = false, // 👈 Eksik alan
-                packages = new List<ShipinkPackageDto>
-                {   
-                new ShipinkPackageDto
+                sales_invoice = new SalesInvoice
                 {
-                    dimension_unit = "cm", // 👈 Eksik alan
-                    weight_unit = "kg",    // 👈 Eksik alan
-                    weight = cargo.Weight > 0 ? cargo.Weight : 1.0,
-                    width = cargo.Width > 0 ? cargo.Width : 15,
-                    height = cargo.Height > 0 ? cargo.Height : 10,
-                    length = cargo.Length > 0 ? cargo.Length : 20
-                }
-                }
+                    no = $"EFA{DateTime.Now:yyyyMMddHHmm}{cargoDetailId}",
+                    date = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    url = "https://example.com/invoice.pdf"
+                },
+                packages = new List<ShipinkPackageDto>
+        {
+            new ShipinkPackageDto
+            {
+                dimension_unit = "cm",
+                weight_unit = "kg",
+                weight = cargo.Weight > 0 ? (double)cargo.Weight : 1.0,
+                width = cargo.Width > 0 ? (int)cargo.Width : 15,
+                height = cargo.Height > 0 ? (int)cargo.Height : 10,
+                length = cargo.Length > 0 ? (int)cargo.Length : 20
+            }
+        },
+                create_invoice = false,
             };
 
-            // 3. İSTEK GÖNDER (Artık DTO ile çok daha temiz)
-            var response = await client.PostAsJsonAsync($"{_settings.BaseUrl}/shipments", shipmentRequest);
+            // KRİTİK: DTO etiketlerini ezmemesi için PropertyNamingPolicy null olmalı
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = null,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            // DEBUG: Buradaki çıktıyı mutlaka Postman'e yapıştırıp dene
+            var jsonDebug = JsonSerializer.Serialize(shipmentRequest, jsonOptions);
+            Console.WriteLine($">>>>> GİDEN JSON: {jsonDebug}");
+
+            // DİKKAT: jsonOptions parametresini eklemeyi unutma!
+            var response = await client.PostAsJsonAsync($"{_settings.BaseUrl}/shipments", shipmentRequest, jsonOptions);
 
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
-                return $"Shipink Hatası: {error}";
+                // Hatanın detayını daha net görmek için:
+                return $"Shipink Hatası ({(int)response.StatusCode}): {error}";
             }
 
-            // 4. BAŞARILI: Tip güvenli şekilde veriyi okuyoruz
-            var result = await response.Content.ReadFromJsonAsync<ShipinkShipmentResponseDto>();
+            var result = await response.Content.ReadFromJsonAsync<ShipinkShipmentResponseDto>(jsonOptions);
 
             if (result != null && result.success)
             {
                 cargo.TrackingNumber = result.data.carrier.shipment_id;
                 cargo.ShipinkShipmentId = result.data.id;
-                cargo.CurrentStatus = CargoStatus.LabelCreated; // Enum kullanımı
+                cargo.CurrentStatus = CargoStatus.LabelCreated;
 
                 await _cargoDetailDal.Update(cargo);
                 return $"Başarılı! Takip No: {cargo.TrackingNumber}";

@@ -11,6 +11,7 @@ using MultiShop.Cargo.DataAccessLayer.EntityFramework;
 using MultiShop.Cargo.WebApi.Consumers;
 using MultiShop.Shared.Constants;
 using MultiShop.Shared.Events;
+using MultiShop.Shared.Events.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddMassTransitHostedService();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

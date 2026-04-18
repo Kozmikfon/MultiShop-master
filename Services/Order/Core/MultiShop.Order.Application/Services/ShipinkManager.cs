@@ -48,9 +48,10 @@ namespace MultiShop.Order.Application.Services
                     phone = new { main = address.Phone },
                     address = new
                     {
-                        street = address.Detail1,
-                        city = address.City,
-                        state = address.District,
+                        street = $"{address.Detail1} {address.Detail2}",
+                        city = address.District,
+                        state = address.City,
+                        zip=address.ZipCode,
                         country_code = "TR"
                     }
                 },

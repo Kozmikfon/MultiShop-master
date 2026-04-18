@@ -3,7 +3,7 @@ using MultiShop.Cargo.BusinessLayer.Abstract;
 using MultiShop.Cargo.DataAccessLayer.Abstract;
 using MultiShop.Cargo.EntityLayer.Concrete.Enums;
 using MultiShop.Shared.Enums;
-using MultiShop.Shared.Events;
+using MultiShop.Shared.Events.Abstract;
 
 namespace MultiShop.Cargo.WebApi.Consumers
 {

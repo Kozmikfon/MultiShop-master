@@ -4,6 +4,7 @@ using MultiShop.Order.Application.Dtos.ExternalDtos;
 using MultiShop.Order.Application.Features.Mediator.Commands.OrderingCommands;
 using MultiShop.Order.Application.Interfaces;
 using MultiShop.Order.Domain.Entities;
+using MultiShop.Shared.Enums;
 using MultiShop.Shared.Events.Abstract;
 using System.Net.Http.Json;
 using System.Text;
@@ -59,8 +60,14 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
                 TotalPrice = request.TotalPrice,
                 UserId = request.UserId,
                 AddressId = request.AddressId,
-                ShipinkOrderId = shipinkId // 👈 SQL'e bu ID ile mühürlendi
-                
+                ShipinkOrderId = shipinkId, // 👈 SQL'e bu ID ile mühürlendi
+
+                ReceiverName = address.Name,
+                ReceiverSurname = address.Surname,
+                ReceiverEmail = address.Email,
+                ReceiverPhone = address.Phone,
+                OrderStatus=OrderStatus.Pending
+
             };
             await _orderingRepository.CreateAsync(ordering);
 

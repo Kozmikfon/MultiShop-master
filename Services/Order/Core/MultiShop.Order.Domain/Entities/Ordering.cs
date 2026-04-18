@@ -20,6 +20,10 @@ namespace MultiShop.Order.Domain.Entities
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
         public List<OrderDetail> OrderDetails { get; set; }
 
+        public string ReceiverName { get; set; }
+        public string ReceiverSurname { get; set; }
+        public string ReceiverEmail { get; set; }
+        public string ReceiverPhone { get; set; }
         public string? TrackingNumber { get; set; } // Kargo takip numarası (isteğe bağlı)
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; // Sipariş durumu (örneğin: Pending, Shipped, Delivered)
         

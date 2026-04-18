@@ -33,6 +33,10 @@ namespace MultiShop.Order.WebApi.Consumers
                 {
                     UserId = basketData.UserId,
                     VendorId = vendorId, // 🎯 KRİTİK: Her paket kendi satıcısını bilir!
+                    ReceiverName = basketData.Name,
+                    ReceiverSurname = basketData.Surname,
+                    ReceiverEmail = basketData.Email,
+                    ReceiverPhone = basketData.Phone,
 
                     // Sadece bu paketteki ürünlerin fiyat toplamı
                     TotalPrice = itemsInPackage.Sum(x => x.Price * x.Quantity),
@@ -55,7 +59,7 @@ namespace MultiShop.Order.WebApi.Consumers
                         
                     }).ToList(),
 
-                    AddressId = int.TryParse(basketData.AddressId, out int id) ? id : 0,
+                    AddressId = int.TryParse(basketData.AddressId, out int id) ? id : 1,
                     CargoCompanyId = 3005 // PTT
                 });
             }
