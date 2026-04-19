@@ -45,7 +45,7 @@ builder.Services.AddScoped<IShipinkSettings>(sp =>
 // 3. MASSTRANSIT & RABBITMQ AYARLARI
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<OrderCreatedConsumer>();
+    //x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<OrderPaidConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
@@ -58,10 +58,10 @@ builder.Services.AddMassTransit(x =>
         });
 
         // 1. Kuyruk: Sipariþ Oluþtuðunda
-        cfg.ReceiveEndpoint("order-created-queue", e =>
-        {
-            e.ConfigureConsumer<OrderCreatedConsumer>(context);
-        });
+        //cfg.ReceiveEndpoint("order-created-queue", e =>
+        //{
+        //    e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        //});
 
         // 2. Kuyruk: Ödeme Yapýldýðýnda
         cfg.ReceiveEndpoint("order-paid-queue", e =>

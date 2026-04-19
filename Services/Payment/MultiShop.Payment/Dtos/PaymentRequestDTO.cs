@@ -21,6 +21,10 @@ namespace MultiShop.Payment.Dtos
         public string City { get; set; }
         public string District { get; set; }
 
+        public string ZipCode { get; set; } // Eklendi
+        public string IdentityNumber { get; set; } // Eklendi
+        public string IpAddress { get; set; } // Eklendi
+
         // Sepet İçeriği
         public List<BasketItemDto> BasketItems { get; set; }
     }

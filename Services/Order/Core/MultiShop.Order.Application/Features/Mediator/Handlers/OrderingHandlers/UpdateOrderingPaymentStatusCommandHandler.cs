@@ -55,10 +55,10 @@ namespace MultiShop.Order.Application.Features.Mediator.Handlers.OrderingHandler
                 ReceiverCity = address.City,
                 ReceiverDistrict = address.District,
                 ReceiverAddressDetail = address.Detail1,
-
+                SenderCustomer="multi",
                 CargoCompanyId = 3005,
                 CargoCustomerId = 1, // Interface'de varsa eklemeyi unutma
-                Weight = 1.0,
+                Weight = values.TotalWeight,
                 Width = 10,
                 Height = 10,
                 Length = 10

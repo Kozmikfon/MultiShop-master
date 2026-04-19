@@ -62,12 +62,12 @@ namespace MultiShop.Payment.Services.Concrete
                     Surname = dto.Surname,
                     GsmNumber = dto.GsmNumber,
                     Email = dto.Email,
-                    IdentityNumber = "74455541011",
+                    IdentityNumber = dto.IdentityNumber,
                     RegistrationAddress = dto.RegistrationAddress,
-                    Ip = "85.100.1.1",
+                    Ip = dto.IpAddress ?? "85.100.1.1",
                     City = dto.City,
-                    Country = "Turkey",
-                    ZipCode = "58000"
+                    Country = "Turkey" ,
+                    ZipCode =dto.ZipCode ?? "34000",
                 },
 
                 BillingAddress = new Address
@@ -76,7 +76,7 @@ namespace MultiShop.Payment.Services.Concrete
                     City = dto.City,
                     Country = "Turkey",
                     Description = dto.RegistrationAddress,
-                    ZipCode = "58000"
+                    ZipCode = dto.ZipCode ?? "34000"
                 }
             };
 
