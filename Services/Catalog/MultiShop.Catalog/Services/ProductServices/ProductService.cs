@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using MassTransit;
 using MongoDB.Driver;
 using MultiShop.Catalog.Dtos.CategoryDtos;
 using MultiShop.Catalog.Dtos.ProductDtos;
 using MultiShop.Catalog.Entites;
 using MultiShop.Catalog.Settings;
+using MultiShop.Shared.Events.Concrete;
 
 namespace MultiShop.Catalog.Services.ProductServices
 {
@@ -12,18 +14,31 @@ namespace MultiShop.Catalog.Services.ProductServices
         private readonly IMapper _mapper;
         private readonly IMongoCollection<Product> _productCollection;
         private readonly IMongoCollection<Category> _categoryCollection;
-        public ProductService(IMapper mapper, IDatabaseSettings _databaseSettings)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public ProductService(IMapper mapper, IDatabaseSettings _databaseSettings, IPublishEndpoint publishEndpoint)
         {
             var client = new MongoClient(_databaseSettings.ConnectionString);
             var database = client.GetDatabase(_databaseSettings.DatabaseName);
             _productCollection = database.GetCollection<Product>(_databaseSettings.ProductCollectionName);
             _categoryCollection = database.GetCollection<Category>(_databaseSettings.CategoryCollectionName);
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
+
+        public IPublishEndpoint PublishEndpoint => _publishEndpoint;
+
         public async Task CreateProductAsync(CreateProductDto createProductDto)
         {
             var values = _mapper.Map<Product>(createProductDto);
             await _productCollection.InsertOneAsync(values);
+
+            await _publishEndpoint.Publish(new ProductCreatedEvent
+            {
+                ProductId = values.ProductId,
+                ProductName = values.ProductName,
+            });
+
+            Console.WriteLine($">>>>> [CATALOG]: {values.ProductName} başarıyla kaydedildi. Stok kaydı için event fırlatıldı.");
         }
 
         public async Task DeleteProductAsync(string id)
